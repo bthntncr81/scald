@@ -1,0 +1,1 @@
+import{u as i,f as c}from"./app-DV9Enp-g.js";const f=e=>Object.fromEntries(Object.entries(e).filter(([,r])=>!!r&&typeof r=="string"));function g(e,r){const t=new URLSearchParams(f(r||{})),{data:s,error:o,isLoading:n,mutate:a}=i(`${e}?${t.toString()}`,c);return{refresh:a,categories:s,isLoading:n,isError:o}}export{g as u};
