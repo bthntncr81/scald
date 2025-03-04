@@ -1,0 +1,1 @@
+import{r,d as e}from"./app-p3FobzL5.js";import{u as s}from"./popover-trigger-D9abZrFQ.js";function p(n){const o=r.Children.only(n.children),{getAnchorProps:t}=s();return e.jsx(e.Fragment,{children:r.cloneElement(o,t(o.props,o.ref))})}p.displayName="PopoverAnchor";export{p as P};

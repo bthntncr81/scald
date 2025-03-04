@@ -1,0 +1,1 @@
+import{d as e,o as r,B as a}from"./app-p3FobzL5.js";import{c as t}from"./popover-trigger-D9abZrFQ.js";function c(o){const s=t();return e.jsx(r.footer,{...o,className:a("chakra-popover__footer",o.className),__css:s.footer})}c.displayName="PopoverFooter";export{c as P};

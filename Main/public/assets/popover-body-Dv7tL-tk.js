@@ -1,1 +1,0 @@
-import{g as r,d as t,o as c,B as p}from"./app-DV9Enp-g.js";import{u as d,c as y}from"./popover-trigger-bCcTHQgY.js";const m=r(function(o,s){const{getBodyProps:e}=d(),a=y();return t.jsx(c.div,{...e(o,s),className:p("chakra-popover__body",o.className),__css:a.body})});m.displayName="PopoverBody";export{m as P};
