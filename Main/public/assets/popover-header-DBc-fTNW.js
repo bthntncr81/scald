@@ -1,1 +1,0 @@
-import{g as s,d as t,o as c,B as p}from"./app-p3FobzL5.js";import{u as d,c as m}from"./popover-trigger-D9abZrFQ.js";const n=s(function(e,a){const{getHeaderProps:o}=d(),r=m();return t.jsx(c.header,{...o(e,a),className:p("chakra-popover__header",e.className),__css:r.header})});n.displayName="PopoverHeader";export{n as P};

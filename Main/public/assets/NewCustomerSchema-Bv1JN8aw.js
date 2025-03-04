@@ -1,1 +1,0 @@
-import{c as r,a as e}from"./index.esm-vozbR36e.js";const a=r().shape({firstName:e().required("First name is required"),lastName:e().required("Last name is required"),email:e().email("Invalid email").required("Email is required"),phoneNumber:e().required("Phone number is required"),address:e().required("Address is required")});export{a as N};
