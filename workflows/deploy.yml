@@ -25,6 +25,26 @@ jobs:
       - name: 🛠️ Build Adonis.js App
         run: npm run build
 
+      - name: 📝 Create .env file
+        run: |
+          echo "TZ=UTC" > build/.env
+          echo "PORT=8000" >> build/.env
+          echo "HOST=0.0.0.0" >> build/.env
+          echo "LOG_LEVEL=info" >> build/.env
+          echo "APP_KEY=z47xQ6yWG0Ju4Rv47VO70zP3cYUdjkLc" >> build/.env
+          echo "NODE_ENV=production" >> build/.env
+          echo "SESSION_DRIVER=cookie" >> build/.env
+          echo "DB_HOST=localhost" >> build/.env
+          echo "DB_PORT=3306" >> build/.env
+          echo "DB_USER=resto_user" >> build/.env
+          echo "DB_PASSWORD=Bthntncr81." >> build/.env
+          echo "DB_DATABASE=resto" >> build/.env
+          echo "DRIVE_DISK=fs" >> build/.env
+          echo "SMTP_USERNAME=info@codius.solutions" >> build/.env
+          echo "SMTP_PASSWORD=Codius2024." >> build/.env
+          echo "SMTP_HOST=smtpout.secureserver.net" >> build/.env
+          echo "SMTP_PORT=465" >> build/.env
+
       - name: 🔄 Deploy to Server
         uses: appleboy/ssh-action@v0.1.10
         with:
