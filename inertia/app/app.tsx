@@ -16,6 +16,7 @@ createInertiaApp({
   progress: { color: '#ed8936' },
   title: (title) => title,
   resolve: (name) => {
+    console.log(Object.keys(import.meta.glob('../pages/**/*.tsx')));
     return resolvePageComponent(`../pages/${name}.tsx`, import.meta.glob('../pages/**/*.tsx'));
   },
 
