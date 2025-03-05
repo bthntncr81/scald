@@ -71,12 +71,12 @@ export default class AuthController {
       user.save();
       await record.delete();
 
-      return inertia.render('VerifyEmail', {
+      return inertia.render('Auth/VerifyEmail', {
         success: true,
         message: 'Your email has been verified successfully.',
       });
     } catch (error) {
-      return inertia.render('VerifyEmail', {
+      return inertia.render('Auth/VerifyEmail', {
         success: false,
         message: error.message || 'Something went wrong while verifying your email',
       });
