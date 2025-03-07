@@ -10,9 +10,9 @@ router
     router.post('/', [OrdersController, 'store']);
     router.post('/calculate', [OrdersController, 'calculate']);
   })
-  .prefix('/api/user/orders');
-// .use(middleware.auth({ guards: ['web'] }))
-// .use(middleware.role({ guards: ['customer'] }));
+  .prefix('/api/user/orders')
+  .use(middleware.auth({ guards: ['web'] }))
+  .use(middleware.role({ guards: ['customer'] }));
 
 router
   .get('/api/orders/', [OrdersController, 'adminIndex'])
