@@ -423,7 +423,7 @@ export default class OrdersController {
             .save();
           return response.json({
             success: true,
-            redirectUrl: 'http://localhost:4200?orderId=' + order.id,
+            redirectUrl: 'http://pay.scald.shop?orderId=' + order.id,
           });
         }
       }
