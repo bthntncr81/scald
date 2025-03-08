@@ -8,6 +8,8 @@ router
     router.get('/paypal/cancel', [PaymentsController, 'cancelPaypalOrder']);
     router.get('/stripe/success', [PaymentsController, 'retrieveStripeSession']);
     router.get('/stripe/cancel', [PaymentsController, 'cancelStripeSession']);
+    router.get('/iyzico/success/:orderId', [PaymentsController, 'successIyzico']);
+    router.get('/iyzico/cancel/:orderId', [PaymentsController, 'cancelIyzico']);
   })
   .prefix('/payments')
   .use(middleware.auth({ guards: ['web'] }));

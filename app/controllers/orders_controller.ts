@@ -414,6 +414,18 @@ export default class OrdersController {
             .save();
           return response.json({ success: true, redirectUrl: sessionData.url });
         }
+
+        if (payload.paymentType === 'iyzico') {
+          await data
+            .merge({
+              paymentInfo: JSON.stringify({}),
+            })
+            .save();
+          return response.json({
+            success: true,
+            redirectUrl: 'http://localhost:4200?orderId=' + order.id,
+          });
+        }
       }
 
       await notification_service.sendNewOrderNotification(auth.user!, data);

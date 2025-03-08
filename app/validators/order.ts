@@ -15,7 +15,7 @@ export const orderValidator = vine.compile(
       .requiredWhen('type', '!=', 'dine_in'),
     type: vine.enum(['dine_in', 'delivery', 'pickup']),
     manualDiscount: vine.number().optional(),
-    paymentType: vine.enum(['cash', 'card', 'paypal', 'stripe']),
+    paymentType: vine.enum(['cash', 'card', 'paypal', 'stripe', 'iyzico']),
     customerNote: vine.string().nullable().optional(),
     deliveryDate: vine.string().trim().optional().requiredWhen('type', '=', 'delivery'),
     orderItems: vine.array(

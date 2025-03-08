@@ -71,7 +71,7 @@ export default class Order extends compose(BaseModel, Filterable) {
   declare grandTotal: number;
 
   @column()
-  declare paymentType: 'cash' | 'card' | 'paypal' | 'stripe';
+  declare paymentType: 'cash' | 'card' | 'paypal' | 'stripe' | 'iyzico';
 
   @column()
   declare paymentStatus: boolean;

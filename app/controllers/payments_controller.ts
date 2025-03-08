@@ -130,6 +130,53 @@ export default class PaymentsController {
     }
   }
 
+  public async successIyzico({ request, response, auth }: HttpContext) {
+    try {
+      const orderId = request.param('orderId');
+
+      const order = await Order.query().where('id', orderId).firstOrFail();
+
+      order
+        .merge({
+          paymentStatus: true,
+          paymentInfo: JSON.stringify({}),
+          status: 'processing',
+        })
+        .save();
+
+      await notification_service.sendNewOrderNotification(auth.user!, order);
+
+      transmit.broadcast('orders', { success: true });
+      return response.redirect('/confirm');
+    } catch (error) {
+      return response.redirect('/user/my-orders');
+    }
+  }
+
+  public async cancelIyzico({ request, response, auth }: HttpContext) {
+    try {
+      const orderId = request.param('orderId');
+
+      const order = await Order.query().where('id', orderId).firstOrFail();
+
+      order
+        .merge({
+          paymentStatus: false,
+          paymentInfo: JSON.stringify({}),
+          status: 'failed',
+        })
+        .save();
+
+      await notification_service.sendNewOrderNotification(auth.user!, order);
+
+      transmit.broadcast('orders', { success: true });
+      return response.redirect('/user/my-orders?status=failed');
+    } catch (error) {
+      console.error('Error retrieving Iyzico session:', error);
+      return response.redirect('/user/my-orders');
+    }
+  }
+
   public async cancelStripeSession({ request, response }: HttpContext) {
     const { session_id: sessionId } = request.qs();
     try {
