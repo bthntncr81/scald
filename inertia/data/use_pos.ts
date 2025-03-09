@@ -27,7 +27,7 @@ export interface POSState {
     setVariantsSelected: (variantsSelected: any[]) => void
   ) => void;
   setAddonQty: (
-    addonId: number,
+    addon: any,
     qty: number,
     addonsSelected: POSItemAddon[],
     setAddonsSelected: (addonsSelected: POSItemAddon[]) => void
@@ -154,18 +154,18 @@ const usePOS = create<POSState>()(
         setVariantsSelected(newVariantsSelected);
       },
       setAddonQty: (
-        addonId: number,
+        addon: any,
         qty: number,
         addonsSelected: POSItemAddon[],
         setAddonsSelected: (addonsSelected: POSItemAddon[]) => void
       ) => {
-        console.log('addons quantity change :' + qty);
-        const index = addonsSelected.findIndex((a) => a.id === addonId);
+        const index = addonsSelected.findIndex((a) => a.id === addon.id);
         let newAddonsSelected = [...addonsSelected];
         if (index !== -1) {
           newAddonsSelected[index].quantity = qty;
+        } else {
+          newAddonsSelected = [...addonsSelected, { ...addon, quantity: qty }];
         }
-        console.log(newAddonsSelected);
         setAddonsSelected(newAddonsSelected);
       },
       updateItemInPOS: (updatedItem: POSItem) => {

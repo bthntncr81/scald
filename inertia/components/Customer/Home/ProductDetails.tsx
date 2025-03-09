@@ -375,7 +375,7 @@ export default function ProductDetails({
                               disabled={!addon.isAvailable}
                               value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 1}
                               onValueChange={(qnt) =>
-                                cart.setAddonQty(addon.id, qnt, addonsSelected, setAddonsSelected)
+                                cart.setAddonQty(addon, qnt, addonsSelected, setAddonsSelected)
                               }
                               decrementButtonClassName="text-black bg-white border border-black/15 rounded-full w-8 h-8 hover:text-white"
                               incrementButtonClassName="text-black bg-white border border-black/15 rounded-full w-8 h-8 hover:text-white"
