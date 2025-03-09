@@ -27,6 +27,7 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
 type ProductDetailsProps = {
@@ -95,11 +96,15 @@ export default function ProductDetails({
       subTotal: total / qty,
       total: total,
     };
+    var posItem = cart.POSItems.find((i) => i.id === item.id);
 
-    if (cart.POSItems.find((i) => i.id === item.id)) {
+    if (posItem && posItem?.addons == item.addons) {
       cart.updateItemInPOS(item);
+      toast.success(t('Ürün Güncellendi'));
     } else {
       cart.addItemToPOS(item);
+
+      toast.success(t('Ürün Eklendi'));
     }
 
     resetState();
