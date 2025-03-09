@@ -98,10 +98,12 @@ export default function ProductDetails({
     };
     console.log(cart.POSItems);
     console.log(item);
-    var posItem = cart.POSItems.find((i) => i.id === item.id && i?.addons == item.addons);
+    var posItem = cart.POSItems.find(
+      (i) => i.id === item.id && JSON.stringify(i.addons) === JSON.stringify(item.addons)
+    );
 
     if (posItem) {
-      cart.updateItemInPOS(item);
+      cart.increaseItemInPOS(item.id, item.quantity);
       toast.success(t('Ürün Güncellendi'));
     } else {
       cart.addItemToPOS(item);
