@@ -35,6 +35,7 @@ export type POSItem = {
   id: number;
   name: string;
   description: string;
+  guid?: string;
   price: number;
   image: Record<string, any> & {
     url?: string;

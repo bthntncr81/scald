@@ -77,6 +77,15 @@ export default function ProductDetails({
     setAddonsSelected([]);
   };
 
+  function generateRandomString(length = 10) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
   const itemAddToCart = () => {
     const validationErrors = validateRequiredVariants(menuItem?.variants, variantsSelected, t);
     if (validationErrors.length) return;
@@ -84,6 +93,7 @@ export default function ProductDetails({
     const item: POSItem = {
       id: menuItem.id,
       name: menuItem.name,
+      guid: generateRandomString(10),
       description: menuItem.description,
       image: menuItem.image,
       charges: menuItem.charges,
@@ -103,7 +113,7 @@ export default function ProductDetails({
     );
 
     if (posItem) {
-      cart.increaseItemInPOS(posItem.id, item.quantity);
+      cart.increaseItemInPOS(posItem.guid!, item.quantity);
       toast.success(t('Ürün Güncellendi'));
     } else {
       cart.addItemToPOS(item);

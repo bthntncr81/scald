@@ -33,7 +33,7 @@ export interface POSState {
     setAddonsSelected: (addonsSelected: POSItemAddon[]) => void
   ) => void;
   updateItemInPOS: (item: POSItem) => void;
-  increaseItemInPOS: (id: number, quantity: number) => void;
+  increaseItemInPOS: (guid: string, quantity: number) => void;
   removeItemFromPOS: (item: POSItem) => void;
   setQuantity: (item: POSItem, quantity: number) => void;
   setDiscount: (discount: number, type: 'percentage' | 'amount') => void;
@@ -179,9 +179,9 @@ const usePOS = create<POSState>()(
         get().calculate();
       },
 
-      increaseItemInPOS: (id: number, quantity: number) => {
+      increaseItemInPOS: (guid: string, quantity: number) => {
         set((state) => {
-          var updatedPOSItem = state.POSItems.find((item) => item.id === id);
+          var updatedPOSItem = state.POSItems.find((item) => item.guid === guid);
           updatedPOSItem!.quantity += quantity;
           return {
             ...state,
