@@ -357,7 +357,7 @@ export default function ProductDetails({
                           className="data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 select-none odd:bg-secondary-50"
                         >
                           <Td className="text-sm w-full">
-                            <Checkbox
+                            {/* <Checkbox
                               colorScheme="blue"
                               value={addon.id?.toString()}
                               className="[&>span]:border-black/15"
@@ -367,13 +367,13 @@ export default function ProductDetails({
                               }}
                             >
                               <Text fontSize={14}>{t(addon.name)}</Text>
-                            </Checkbox>
+                            </Checkbox> */}
                           </Td>
 
                           <Td className="text-sm" w="150px">
                             <QuantityController
                               disabled={!addon.isAvailable}
-                              value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 1}
+                              value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 0}
                               onValueChange={(qnt) =>
                                 cart.setAddonQty(addon, qnt, addonsSelected, setAddonsSelected)
                               }
