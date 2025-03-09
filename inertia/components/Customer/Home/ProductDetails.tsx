@@ -365,15 +365,17 @@ export default function ProductDetails({
                               onChange={() => {
                                 cart.selectAddon(addon, addonsSelected, setAddonsSelected);
                               }}
-                            >
-                              <Text fontSize={14}>{t(addon.name)}</Text>
-                            </Checkbox> */}
+                            > */}
+                            {/* </Checkbox> */}
+
+                            <Text fontSize={14}>{t(addon.name)}</Text>
                           </Td>
 
                           <Td className="text-sm" w="150px">
                             <QuantityController
+                              stopSign={0}
                               disabled={!addon.isAvailable}
-                              value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 0}
+                              value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 1}
                               onValueChange={(qnt) =>
                                 cart.setAddonQty(addon, qnt, addonsSelected, setAddonsSelected)
                               }

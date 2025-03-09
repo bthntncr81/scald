@@ -18,6 +18,7 @@ export type POSItemAddon = {
   name: string;
   price: number;
   quantity: number;
+  isSelected?: boolean;
 };
 
 // POS item charge

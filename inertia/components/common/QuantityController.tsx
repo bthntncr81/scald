@@ -11,11 +11,13 @@ interface IQuantityController {
   decrementButtonClassName?: string;
   containerClassName?: string;
   className?: string;
+  stopSign?: number;
 }
 
 export default function QuantityController({
   value,
   defaultValue = 1,
+  stopSign = 1,
   onValueChange,
   disabled = false,
   incrementButtonClassName = '',
@@ -33,12 +35,12 @@ export default function QuantityController({
 
   // Decrement
   const decrement = (currentQuantity: number) => {
-    if (currentQuantity > 1) {
+    if (currentQuantity > stopSign) {
       setQuantity(currentQuantity - 1);
       onValueChange?.(currentQuantity - 1);
     } else {
-      setQuantity(1);
-      onValueChange?.(1);
+      setQuantity(stopSign);
+      onValueChange?.(stopSign);
     }
   };
 
