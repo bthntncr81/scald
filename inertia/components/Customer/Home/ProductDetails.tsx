@@ -106,8 +106,6 @@ export default function ProductDetails({
       subTotal: total / qty,
       total: total,
     };
-    console.log(cart.POSItems);
-    console.log(item);
     var posItem = cart.POSItems.find(
       (i) => i.id === item.id && JSON.stringify(i.addons) === JSON.stringify(item.addons)
     );

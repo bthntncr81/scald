@@ -13,8 +13,6 @@ export default function OrderItemList({ items }: { items: Item[] }) {
   // render variants
   const renderVariant = (variantString: string) => {
     if (!variantString) return null;
-    console.log('naber');
-    console.log(variantString);
     const variants = JSON.parse(variantString);
     return variants?.map((variant: any) => (
       <span key={variant.id}>
