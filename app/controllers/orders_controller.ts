@@ -426,6 +426,45 @@ export default class OrdersController {
             redirectUrl: 'https://pay.scald.shop?orderId=' + order.id,
           });
         }
+
+        if (payload.paymentType === 'iyzico_ceppos') {
+          const url = 'https://sandbox-api.iyzipay.com/v2/in-store/payment';
+
+          const headers = {
+            'x-api-key': 'sxNRebvUIZIhzHWR',
+            'x-secret-key': '9ikxN7OsAbeK9oMLvvI4zECCw9aAgM0x',
+            'x-merchant-id': '3398570',
+            'x-callback-url': 'http://scald.shop/payments/iyzico/success' + order.id,
+            'Content-Type': 'application/json',
+          };
+
+          const body = JSON.stringify({
+            amount: order.grandTotal, // Ödenecek tutar
+            email: auth.user?.email,
+            paymentSource: 'web', // Opsiyonel
+          });
+
+          try {
+            const resp = await fetch(url, {
+              method: 'POST',
+              headers: headers,
+              body: body,
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP Hata Kodu: ${resp.status}`);
+            }
+
+            const d = await resp.json();
+            console.log(d);
+            return response.json({
+              success: true,
+              redirectUrl: (d as any).deepLinkUrl,
+            });
+          } catch (error) {
+            console.error('Ödeme işlemi sırasında hata oluştu:', error);
+          }
+        }
       }
 
       await notification_service.sendNewOrderNotification(auth.user!, data);
