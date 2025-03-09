@@ -62,7 +62,7 @@ export default function QuantityController({
         size="sm"
         className={`${decrementButtonClassName} w-8 h-8`}
         onClick={() => decrement(quantity)}
-        disabled={disabled || quantity <= 1}
+        disabled={disabled || quantity <= stopSign}
       >
         <Minus size={16} />
       </IconButton>
