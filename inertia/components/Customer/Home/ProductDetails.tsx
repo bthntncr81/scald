@@ -103,7 +103,7 @@ export default function ProductDetails({
     );
 
     if (posItem) {
-      cart.increaseItemInPOS(item.id, item.quantity);
+      cart.increaseItemInPOS(posItem.id, item.quantity);
       toast.success(t('Ürün Güncellendi'));
     } else {
       cart.addItemToPOS(item);
