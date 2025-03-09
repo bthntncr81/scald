@@ -159,11 +159,13 @@ const usePOS = create<POSState>()(
         addonsSelected: POSItemAddon[],
         setAddonsSelected: (addonsSelected: POSItemAddon[]) => void
       ) => {
+        console.log('addons quantity change :' + qty);
         const index = addonsSelected.findIndex((a) => a.id === addonId);
         let newAddonsSelected = [...addonsSelected];
         if (index !== -1) {
           newAddonsSelected[index].quantity = qty;
         }
+        console.log(newAddonsSelected);
         setAddonsSelected(newAddonsSelected);
       },
       updateItemInPOS: (updatedItem: POSItem) => {
