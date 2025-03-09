@@ -428,6 +428,7 @@ export default class OrdersController {
         }
 
         if (payload.paymentType === 'iyzico_ceppos') {
+          console.log('naber');
           const url = 'https://sandbox-api.iyzipay.com/v2/in-store/payment';
 
           const headers = {
