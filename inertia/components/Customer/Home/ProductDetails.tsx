@@ -96,9 +96,9 @@ export default function ProductDetails({
       subTotal: total / qty,
       total: total,
     };
-    var posItem = cart.POSItems.find((i) => i.id === item.id);
+    var posItem = cart.POSItems.find((i) => i.id === item.id && i?.addons == item.addons);
 
-    if (posItem && posItem?.addons == item.addons) {
+    if (posItem) {
       cart.updateItemInPOS(item);
       toast.success(t('Ürün Güncellendi'));
     } else {
