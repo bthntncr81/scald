@@ -375,7 +375,7 @@ export default function ProductDetails({
                             <QuantityController
                               stopSign={0}
                               disabled={!addon.isAvailable}
-                              value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 1}
+                              value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 0}
                               onValueChange={(qnt) =>
                                 cart.setAddonQty(addon, qnt, addonsSelected, setAddonsSelected)
                               }
