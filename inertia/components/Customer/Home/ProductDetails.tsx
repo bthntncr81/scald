@@ -107,7 +107,10 @@ export default function ProductDetails({
       total: total,
     };
     var posItem = cart.POSItems.find(
-      (i) => i.id === item.id && JSON.stringify(i.addons) === JSON.stringify(item.addons)
+      (i) =>
+        i.id === item.id &&
+        JSON.stringify(i.addons) === JSON.stringify(item.addons) &&
+        JSON.stringify(i.variants) === JSON.stringify(item.variants)
     );
 
     if (posItem) {

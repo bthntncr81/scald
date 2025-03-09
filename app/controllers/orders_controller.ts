@@ -428,7 +428,7 @@ export default class OrdersController {
             redirectUrl: 'https://pay.scald.shop?orderId=' + order.id,
           });
         }
- 
+
         if (payload.paymentType === 'iyzico_ceppos') {
           try {
             console.log('girdim');
