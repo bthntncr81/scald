@@ -443,7 +443,7 @@ export default class OrdersController {
                 headers: {
                   'x-api-key': 'sxNRebvUIZIhzHWR',
                   'x-secret-key': '9ikxN7OsAbeK9oMLvvI4zECCw9aAgM0x',
-                  'x-merchant-id': '3398570',
+                  'x-merchant-id': 3398570,
                   'x-callback-url': 'http://scald.shop/payments/iyzico/success' + order.id,
                   'Content-Type': 'application/json',
                 },
@@ -451,15 +451,15 @@ export default class OrdersController {
             );
 
             console.log('Ödeme başarılı:', resp);
+
+            return response.json({
+              success: true,
+              redirectUrl: resp.data.deepLinkUrl,
+            });
           } catch (error) {
             console.error('Ödeme hatası:', error.response?.data || error.message);
           }
           console.log('return işlemi çalışacak!');
-
-          return response.json({
-            success: true,
-            redirectUrl: 'https://pay.scald.shop?orderId=' + order.id,
-          });
         }
       }
 
