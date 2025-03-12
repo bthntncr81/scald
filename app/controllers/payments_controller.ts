@@ -5,6 +5,7 @@ import notification_service from '#services/notification_service';
 import StripePayment from '#services/payment/stripe';
 import PaymentMethod from '#models/payment_method';
 import transmit from '@adonisjs/transmit/services/main';
+import axios from 'axios';
 
 export default class PaymentsController {
   private async getMethodConfig(key: string) {
@@ -133,21 +134,60 @@ export default class PaymentsController {
   public async successIyzico({ request, response, auth }: HttpContext) {
     try {
       const orderId = request.param('orderId');
+      const data = request.param('data');
+      const token = request.param('paymentSessionToken');
+      console.log(data);
 
-      const order = await Order.query().where('id', orderId).firstOrFail();
+      if (data) {
+        const resp = await axios.post(
+          'https://sandbox-api.iyzipay.com/v2/in-store/payment',
+          {
+            data: data, // Ödenecek tutar
+            paymentSessionToken: token,
+            paymentSource: 'web', // Opsiyonel
+          },
+          {
+            headers: {
+              'x-api-key': 'sxNRebvUIZIhzHWR',
+              'x-secret-key': '9ikxN7OsAbeK9oMLvvI4zECCw9aAgM0x',
+              'x-merchant-id': 3398570,
+            },
+          }
+        );
+        if (resp.data.status === 'success') {
+          const order = await Order.query().where('id', orderId).firstOrFail();
 
-      order
-        .merge({
-          paymentStatus: true,
-          paymentInfo: JSON.stringify({}),
-          status: 'processing',
-        })
-        .save();
+          order
+            .merge({
+              paymentStatus: true,
+              paymentInfo: JSON.stringify({}),
+              status: 'processing',
+            })
+            .save();
 
-      await notification_service.sendNewOrderNotification(auth.user!, order);
+          await notification_service.sendNewOrderNotification(auth.user!, order);
 
-      transmit.broadcast('orders', { success: true });
-      return response.redirect('/confirm');
+          transmit.broadcast('orders', { success: true });
+          return response.redirect('/confirm');
+        } else {
+          return response.redirect('/user/my-orders');
+        }
+      } else {
+        const order = await Order.query().where('id', orderId).firstOrFail();
+
+        order
+          .merge({
+            paymentStatus: true,
+            paymentInfo: JSON.stringify({}),
+            status: 'processing',
+          })
+          .save();
+
+        await notification_service.sendNewOrderNotification(auth.user!, order);
+
+        transmit.broadcast('orders', { success: true });
+        return response.redirect('/confirm');
+      }
     } catch (error) {
       return response.redirect('/user/my-orders');
     }
