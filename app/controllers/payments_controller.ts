@@ -153,6 +153,9 @@ export default class PaymentsController {
             },
           }
         );
+
+        const order = await Order.query().where('id', orderId).firstOrFail();
+
         console.log('----------------------------------------------------------- ');
         console.log('----------------------------------------------------------- ');
         console.log('----------------------------------------------------------- ');
@@ -166,8 +169,6 @@ export default class PaymentsController {
           resp.data.inStoreCompleteOperation &&
           !resp.data.inStoreCompleteOperation.paymentFailedResult
         ) {
-          const order = await Order.query().where('id', orderId).firstOrFail();
-
           order
             .merge({
               paymentStatus: true,
@@ -181,7 +182,18 @@ export default class PaymentsController {
           transmit.broadcast('orders', { success: true });
           return response.redirect('/confirm');
         } else {
-          return response.redirect('/user/my-orders');
+          order
+            .merge({
+              paymentStatus: false,
+              paymentInfo: JSON.stringify({}),
+              status: 'failed',
+            })
+            .save();
+
+          await notification_service.sendNewOrderNotification(auth.user!, order);
+
+          transmit.broadcast('orders', { success: true });
+          return response.redirect('/user/my-orders?status=failed');
         }
       } else {
         const order = await Order.query().where('id', orderId).firstOrFail();
