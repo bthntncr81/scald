@@ -134,8 +134,10 @@ export default class PaymentsController {
   public async successIyzico({ request, response, auth }: HttpContext) {
     try {
       const orderId = request.param('orderId');
-      const data = request.param('data');
-      const token = request.param('paymentSessionToken');
+
+      const queryParams = request.qs();
+      const data = request.input('data');
+      const token = request.input('paymentSessionToken');
       console.log('naber ');
       console.log('naber ');
       console.log('naber ');
@@ -145,7 +147,7 @@ export default class PaymentsController {
       console.log('naber ');
       console.log('naber ');
       console.log('naber ');
-      console.log('naber ');
+      console.log(queryParams);
       console.log('Order Id :' + orderId);
       console.log('data Id :' + data);
       console.log('token Id :' + token);
@@ -177,6 +179,29 @@ export default class PaymentsController {
             },
           }
         );
+
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log(resp);
+
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
+        console.log('naber ');
         if (resp.data.status === 'success') {
           const order = await Order.query().where('id', orderId).firstOrFail();
 
