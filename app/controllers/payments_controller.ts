@@ -136,7 +136,30 @@ export default class PaymentsController {
       const orderId = request.param('orderId');
       const data = request.param('data');
       const token = request.param('paymentSessionToken');
-      console.log(data);
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('Order Id :' + orderId);
+      console.log('data Id :' + data);
+      console.log('token Id :' + token);
+
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
+      console.log('naber ');
 
       if (data) {
         const resp = await axios.post(
