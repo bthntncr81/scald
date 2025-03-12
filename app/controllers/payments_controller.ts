@@ -135,41 +135,15 @@ export default class PaymentsController {
     try {
       const orderId = request.param('orderId');
 
-      const queryParams = request.qs();
       const data = request.input('data');
       const token = request.input('paymentSessionToken');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log(queryParams);
-      console.log('Order Id :' + orderId);
-      console.log('data Id :' + data);
-      console.log('token Id :' + token);
 
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-      console.log('naber ');
-
-      if (data) {
+      if (data.length > 0) {
         const resp = await axios.post(
-          'https://sandbox-api.iyzipay.com/v2/in-store/payment',
+          'https://sandbox-api.iyzipay.com/v2/in-store/crypt/decrypt',
           {
             data: data, // Ödenecek tutar
             paymentSessionToken: token,
-            paymentSource: 'web', // Opsiyonel
           },
           {
             headers: {
