@@ -444,13 +444,14 @@ export default class OrdersController {
                   'x-api-key': 'sxNRebvUIZIhzHWR',
                   'x-secret-key': '9ikxN7OsAbeK9oMLvvI4zECCw9aAgM0x',
                   'x-merchant-id': 3398570,
-                  'x-callback-url': 'http://scald.shop/payments/iyzico/success' + order.id,
+                  'x-callback-url': 'http://scald.shop/payments/iyzico/success/' + order.id,
                   'Content-Type': 'application/json',
                 },
               }
             );
 
             console.log('Ödeme başarılı:', resp);
+            console.log('Ödeme başarılı:', data);
 
             return response.json({
               success: true,
