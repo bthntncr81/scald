@@ -162,7 +162,10 @@ export default class PaymentsController {
         console.log('----------------------------------------------------------- ');
         console.log('----------------------------------------------------------- ');
         console.log('----------------------------------------------------------- ');
-        if (resp.data.status === 'success') {
+        if (
+          resp.data.inStoreCompleteOperation &&
+          !resp.data.inStoreCompleteOperation.paymentFailedResult
+        ) {
           const order = await Order.query().where('id', orderId).firstOrFail();
 
           order
