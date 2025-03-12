@@ -182,6 +182,7 @@ export default class PaymentsController {
           transmit.broadcast('orders', { success: true });
           return response.redirect('/confirm');
         } else {
+          console.log(resp.data.inStoreCompleteOperation.paymentFailedResult);
           order
             .merge({
               paymentStatus: false,
