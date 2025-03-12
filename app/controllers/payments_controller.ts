@@ -153,29 +153,15 @@ export default class PaymentsController {
             },
           }
         );
+        console.log('----------------------------------------------------------- ');
+        console.log('----------------------------------------------------------- ');
+        console.log('----------------------------------------------------------- ');
 
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log(resp);
+        console.log(resp.data);
 
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
-        console.log('naber ');
+        console.log('----------------------------------------------------------- ');
+        console.log('----------------------------------------------------------- ');
+        console.log('----------------------------------------------------------- ');
         if (resp.data.status === 'success') {
           const order = await Order.query().where('id', orderId).firstOrFail();
 
