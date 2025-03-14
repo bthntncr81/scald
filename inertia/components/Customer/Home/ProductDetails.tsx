@@ -375,7 +375,7 @@ export default function ProductDetails({
                           <Td className="text-sm" w="150px">
                             <QuantityController
                               stopSign={0}
-                              defaultValue={1}
+                              defaultValue={0}
                               disabled={!addon.isAvailable}
                               value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 0}
                               onValueChange={(qnt) =>
