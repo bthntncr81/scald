@@ -33,25 +33,47 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /var/www/html/scald
+
+            # 📂 Uploads klasörünü yedekle
+            if [ -d "build/public/uploads" ]; then
+              mv build/public/uploads /tmp/uploads_backup
+            fi
+
+            # 📥 Güncellemeleri çek
             git pull origin main
+
+            # 📦 Bağımlılıkları yükle
             npm install
+
+            # 🔨 Uygulamayı derle
             npm run build
-            echo "TZ=UTC" > build/.env
-            echo "PORT=8000" >> build/.env
-            echo "HOST=0.0.0.0" >> build/.env
-            echo "LOG_LEVEL=info" >> build/.env
-            echo "APP_KEY=z47xQ6yWG0Ju4Rv47VO70zP3cYUdjkLc" >> build/.env
-            echo "NODE_ENV=production" >> build/.env
-            echo "SESSION_DRIVER=cookie" >> build/.env
-            echo "DB_HOST=localhost" >> build/.env
-            echo "DB_PORT=3306" >> build/.env
-            echo "DB_USER=resto_user" >> build/.env
-            echo "DB_PASSWORD=Bthntncr81." >> build/.env
-            echo "DB_DATABASE=resto" >> build/.env
-            echo "DRIVE_DISK=fs" >> build/.env
-            echo "SMTP_USERNAME=info@codius.solutions" >> build/.env
-            echo "SMTP_PASSWORD=Codius2024." >> build/.env
-            echo "SMTP_HOST=smtpout.secureserver.net" >> build/.env
-            echo "SMTP_PORT=465" >> build/.env
+
+            # 🗂️ .env dosyasını oluştur
+            cat <<EOF > build/.env
+            TZ=UTC
+            PORT=8000
+            HOST=0.0.0.0
+            LOG_LEVEL=info
+            APP_KEY=z47xQ6yWG0Ju4Rv47VO70zP3cYUdjkLc
+            NODE_ENV=production
+            SESSION_DRIVER=cookie
+            DB_HOST=localhost
+            DB_PORT=3306
+            DB_USER=resto_user
+            DB_PASSWORD=Bthntncr81.
+            DB_DATABASE=resto
+            DRIVE_DISK=fs
+            SMTP_USERNAME=info@codius.solutions
+            SMTP_PASSWORD=Codius2024.
+            SMTP_HOST=smtpout.secureserver.net
+            SMTP_PORT=465
+            EOF
+
+            # 🔄 Uploads klasörünü geri yükle
+            if [ -d "/tmp/uploads_backup" ]; then
+              mv /tmp/uploads_backup build/public/uploads
+            fi
+
+            # 🚀 Sunucuyu yeniden başlat
             pm2 restart adonis-app || pm2 start build/bin/server.js --name adonis-app
             pm2 save
