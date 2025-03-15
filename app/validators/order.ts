@@ -109,7 +109,7 @@ export const orderUpdateValidator = vine.compile(
       .requiredWhen('type', '!=', 'dine_in'),
     type: vine.enum(['dine_in', 'delivery', 'pickup']),
     manualDiscount: vine.number().optional(),
-    paymentType: vine.enum(['cash', 'card', 'paypal', 'stripe']),
+    paymentType: vine.enum(['cash', 'card', 'paypal', 'stripe', 'iyzico', 'iyzico_ceppos']),
     deliveryDate: vine.string().trim().optional().requiredWhen('type', '=', 'delivery'),
     status: vine.enum((field) => {
       return getStatus(field.parent.type);
