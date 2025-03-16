@@ -10,7 +10,7 @@ i18n
     interpolation: {
       escapeValue: false,
     },
-    lng: JSON.parse(localStorage.getItem('lang') || '{"name": "English", "code": "en"}')?.code,
+    lng: JSON.parse(localStorage.getItem('lang') || '{"name": "Türkçe", "code": "tr"}')?.code,
     fallbackLng: false,
     react: {
       useSuspense: false,

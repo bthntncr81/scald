@@ -431,7 +431,15 @@ export default class OrdersController {
 
         if (payload.paymentType === 'iyzico_ceppos') {
           try {
-            console.log('girdim');
+            const paymentMethod = await PaymentMethod.query()
+              .where('key', 'iyzico_ceppos')
+              .andWhere('status', true)
+              .firstOrFail();
+
+            // paymentMethod üzerinden gerekli bilgileri alıyoruz
+            const apiKey = paymentMethod.key; // Örneğin, API anahtarı
+            const secretKey = paymentMethod!.secret; // Örneğin, gizli anahtar
+            const merchantId = paymentMethod!.webhook; // Örneğin, merchant ID
             const resp = await axios.post(
               'https://sandbox-api.iyzipay.com/v2/in-store/payment',
               {
@@ -441,17 +449,14 @@ export default class OrdersController {
               },
               {
                 headers: {
-                  'x-api-key': 'sxNRebvUIZIhzHWR',
-                  'x-secret-key': '9ikxN7OsAbeK9oMLvvI4zECCw9aAgM0x',
-                  'x-merchant-id': 3398570,
+                  'x-api-key': apiKey,
+                  'x-secret-key': secretKey,
+                  'x-merchant-id': merchantId,
                   'x-callback-url': 'http://scald.shop/payments/iyzico/success/' + order.id,
                   'Content-Type': 'application/json',
                 },
               }
             );
-
-            console.log('Ödeme başarılı:', resp);
-            console.log('Ödeme başarılı:', data);
 
             return response.json({
               success: true,
