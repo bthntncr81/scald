@@ -438,7 +438,7 @@ export default class OrdersController {
 
             console.log(paymentMethod);
             // paymentMethod üzerinden gerekli bilgileri alıyoruz
-            const apiKey = paymentMethod.key; // Örneğin, API anahtarı
+            const apiKey = paymentMethod.public; // Örneğin, API anahtarı
             const secretKey = paymentMethod!.secret; // Örneğin, gizli anahtar
             const merchantId = paymentMethod!.webhook; // Örneğin, merchant ID
             const resp = await axios.post(
