@@ -138,6 +138,15 @@ export default class PaymentsController {
       const data = request.input('data');
       const token = request.input('paymentSessionToken');
 
+      console.log('----------------------------------------------------------- ');
+      console.log('----------------------------------------------------------- ');
+      console.log('----------------------------------------------------------- ');
+
+      console.log(data);
+
+      console.log('----------------------------------------------------------- ');
+      console.log('----------------------------------------------------------- ');
+      console.log('----------------------------------------------------------- ');
       if (data.length > 0) {
         const resp = await axios.post(
           'https://sandbox-api.iyzipay.com/v2/in-store/crypt/decrypt',
