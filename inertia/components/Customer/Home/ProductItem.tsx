@@ -26,13 +26,13 @@ export default function ProductItem(props: IProps) {
   return (
     <div className="h-full w-full @container p-1 max-w-72">
       <Box
-        className="relative group w-full sm:max-h-72 p-3 rounded-2xl shadow-item overflow-hidden cursor-pointer bg-white"
+        className="relative group w-full  p-3 rounded-2xl shadow-item overflow-hidden cursor-pointer bg-white"
         onClick={onOpen}
       >
         <img
           src={image?.url}
           alt={name}
-          className="w-full h-[115px] sm:group-hover:h-[115px] sm:h-[165px] object-cover rounded-lg mb-3 transition-all duration-100"
+          className="w-full  sm:h-[165px] object-cover rounded-lg mb-3 transition-all duration-100"
           onError={(e) => (e.currentTarget.src = '/default_fallback.png')}
         />
 
