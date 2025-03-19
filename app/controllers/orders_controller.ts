@@ -452,7 +452,7 @@ export default class OrdersController {
                   'x-api-key': apiKey,
                   'x-secret-key': secretKey,
                   'x-merchant-id': merchantId,
-                  'x-callback-url': 'http://scald.shop/payments/iyzico/success/' + order.id,
+                  'x-callback-url': 'scald://http://scald.shop/payments/iyzico/success/' + order.id,
                   'Content-Type': 'application/json',
                 },
               }
