@@ -1,7 +1,10 @@
 import QuantityController from '@/components/common/QuantityController';
+import usePOS, { POSState } from '@/data/use_pos';
 import useDebounce from '@/hooks/useDebounce';
 import useWindowSize from '@/hooks/useWindowSize';
 import fetcher from '@/lib/fetcher';
+import { PageProps } from '@/types';
+import { Charge, Customer, POSItem, POSItemAddon, POSItemVariant } from '@/types/pos_type';
 import { convertToCurrencyFormat } from '@/utils/currency_formatter';
 import {
   Badge,
@@ -37,8 +40,9 @@ import {
   useBoolean,
   useDisclosure,
 } from '@chakra-ui/react';
+import { usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Add, ArrowRight, SearchNormal, Trash, Edit2 } from 'iconsax-react';
+import { Add, ArrowRight, Edit2, SearchNormal, Trash } from 'iconsax-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -46,14 +50,10 @@ import useSWR, { useSWRConfig } from 'swr';
 import { match, P } from 'ts-pattern';
 import CustomerInsertForm from './CustomerInsertForm';
 import CustomerUpdateForm from './CustomerUpdateForm';
+import DiscountTypeRadioGroup from './DiscountTypeSelect';
 import EditPOSItem from './EditPOSItem';
 import OrderTypeRadioGroup from './OrderTypeSelect';
 import PaymentTypeRadioGroup from './PaymentTypeSelect';
-import DiscountTypeRadioGroup from './DiscountTypeSelect';
-import { usePage } from '@inertiajs/react';
-import { PageProps } from '@/types';
-import usePOS, { POSState } from '@/data/use_pos';
-import { Charge, POSItemVariant, POSItemAddon, Customer, POSItem } from '@/types/pos_type';
 
 export const POSCheckoutForm = () => {
   const pos = usePOS();
@@ -197,7 +197,10 @@ export const POSCheckoutForm = () => {
 
   const content = (
     <>
-      <div className="@[900px]:sticky top-0 right-0 w-full @[900px]:w-auto inset-y-0 flex flex-col @[900px]:min-w-[512px] h-[calc(100vh-65px)]  md:h-[calc(100vh-76px)] bg-white border-l border-black/10 overflow-hidden">
+      <div
+        style={{ minWidth: '300px', width: '300px' }}
+        className="@[900px]:sticky top-0 right-0 w-full @[900px]:w-auto inset-y-0 flex flex-col @[900px]:min-w-[512px] h-[calc(100vh-65px)]  md:h-[calc(100vh-76px)] bg-white border-l border-black/10 overflow-hidden"
+      >
         <Flex
           flexDir="column"
           rowGap="2"

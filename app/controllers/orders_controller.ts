@@ -3,6 +3,13 @@ import MenuItem from '#models/menu_item';
 import Order from '#models/order';
 import axios from 'axios';
 
+import BusinessSetup from '#models/business_setup';
+import OrderItem from '#models/order_item';
+import PaymentMethod from '#models/payment_method';
+import Setting from '#models/setting';
+import notification_service from '#services/notification_service';
+import Paypal from '#services/payment/paypal';
+import StripePayment from '#services/payment/stripe';
 import {
   bulkCustomUpdateValidator,
   customUpdateValidator,
@@ -11,17 +18,10 @@ import {
   orderValidator,
 } from '#validators/order';
 import type { HttpContext } from '@adonisjs/core/http';
+import transmit from '@adonisjs/transmit/services/main';
+import { stringify } from 'csv-stringify/sync';
 import { DateTime } from 'luxon';
 import Roles from '../enum/roles.js';
-import BusinessSetup from '#models/business_setup';
-import notification_service from '#services/notification_service';
-import { stringify } from 'csv-stringify/sync';
-import Setting from '#models/setting';
-import Paypal from '#services/payment/paypal';
-import StripePayment from '#services/payment/stripe';
-import PaymentMethod from '#models/payment_method';
-import transmit from '@adonisjs/transmit/services/main';
-import OrderItem from '#models/order_item';
 
 type VariantType = { id: number; optionIds: Array<number> };
 type AddonType = { id: number; quantity: number };
@@ -436,8 +436,9 @@ export default class OrdersController {
               .andWhere('status', true)
               .firstOrFail();
 
+            console.log(paymentMethod);
             // paymentMethod üzerinden gerekli bilgileri alıyoruz
-            const apiKey = paymentMethod.key; // Örneğin, API anahtarı
+            const apiKey = paymentMethod.public; // Örneğin, API anahtarı
             const secretKey = paymentMethod!.secret; // Örneğin, gizli anahtar
             const merchantId = paymentMethod!.webhook; // Örneğin, merchant ID
             const resp = await axios.post(
