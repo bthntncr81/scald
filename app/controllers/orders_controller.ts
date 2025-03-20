@@ -357,6 +357,8 @@ export default class OrdersController {
         total,
         totalTax,
         totalCharges,
+        paymentStatus:
+          restPayload.type === 'delivery' || restPayload.type === 'dine_in' ? false : true,
         discount: discount,
         manualDiscount: payload.manualDiscount || 0,
         deliveryCharge,
