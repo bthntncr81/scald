@@ -198,7 +198,7 @@ export const POSCheckoutForm = () => {
   const content = (
     <>
       <div
-        style={{ minWidth: '300px', width: '300px' }}
+        style={{ minWidth: '400px', width: '400px' }}
         className="@[900px]:sticky top-0 right-0 w-full @[900px]:w-auto inset-y-0 flex flex-col @[900px]:min-w-[512px] h-[calc(100vh-65px)]  md:h-[calc(100vh-76px)] bg-white border-l border-black/10 overflow-hidden"
       >
         <Flex
@@ -394,7 +394,7 @@ export const POSCheckoutForm = () => {
                     <Tr>
                       <Th className="w-full px-6">{t('ITEMS')}</Th>
                       <Th className="text-center w-[100px] p-0">{t('QTY')}</Th>
-                      <Th className="w-[100px] px-3">{t('PRICE')}</Th>
+                      {/* <Th className="w-[100px] px-3">{t('PRICE')}</Th> */}
                       <Th className="w-[100px] pl-2 pr-6">{t('TOTAL')}</Th>
                     </Tr>
                   </Thead>
@@ -474,9 +474,9 @@ export const POSCheckoutForm = () => {
                               }}
                             />
                           </Td>
-                          <Td isNumeric className="px-2">
+                          {/* <Td isNumeric className="px-2">
                             {convertToCurrencyFormat(item.subTotal ?? 0)}
-                          </Td>
+                          </Td> */}
                           <Td isNumeric className="pl-2 pr-6">
                             {convertToCurrencyFormat(item?.total ?? 0)}
                           </Td>
