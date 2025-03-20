@@ -358,6 +358,7 @@ export default function EditPOSItem({ ...props }: POSItem) {
                             <Td className="text-sm" w="150px">
                               <QuantityController
                                 stopSign={0}
+                                defaultValue={0}
                                 value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 0}
                                 disabled={!addonsSelected.find((a) => a.id === addon.id)}
                                 onValueChange={(qnt) =>

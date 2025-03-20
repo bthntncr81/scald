@@ -367,7 +367,9 @@ export default function POSItem({
 
                           <Td className="text-sm" w="150px">
                             <QuantityController
-                              value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 1}
+                              stopSign={0}
+                              defaultValue={0}
+                              value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 0}
                               onValueChange={(qnt) =>
                                 pos.setAddonQty(addon.id, qnt, addonsSelected, setAddonsSelected)
                               }
