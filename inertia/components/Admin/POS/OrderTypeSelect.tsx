@@ -67,9 +67,9 @@ export default function OrderTypeRadioGroup({
   } = usePage() as { props: PageProps };
 
   const options = [
-    { label: 'Dine-in', value: 'dine_in', disabled: !branding?.business?.dineIn },
+    { label: 'Pick-up', value: 'dine_in', disabled: !branding?.business?.dineIn },
     { label: 'Delivery', value: 'delivery', disabled: !branding?.business?.delivery },
-    { label: 'Pick-up', value: 'pickup', disabled: !branding?.business?.pickup },
+    { label: 'Dine-in', value: 'pickup', disabled: !branding?.business?.pickup },
   ];
 
   // Find the first non-disabled option
