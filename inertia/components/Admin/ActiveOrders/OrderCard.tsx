@@ -88,7 +88,7 @@ export default function OrderCard({
             colorScheme={{ dine_in: 'cyan', delivery: 'primary', pickup: 'blue' }?.[type]}
             mb={1}
           >
-            {t(startCase(type))}
+            {t(startCase(type == 'dine_in' ? 'pickup' : type == 'pickup' ? 'dine_in' : 'delivery'))}
           </Badge>
           <p className="text-secondary-600 font-bold mb-1">#{orderNumber}</p>
           <p className="text-secondary-400 text-sm">
