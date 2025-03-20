@@ -357,7 +357,8 @@ export default function EditPOSItem({ ...props }: POSItem) {
 
                             <Td className="text-sm" w="150px">
                               <QuantityController
-                                value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 1}
+                                stopSign={0}
+                                value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 0}
                                 disabled={!addonsSelected.find((a) => a.id === addon.id)}
                                 onValueChange={(qnt) =>
                                   pos.setAddonQty(addon.id, qnt, addonsSelected, setAddonsSelected)
@@ -384,7 +385,9 @@ export default function EditPOSItem({ ...props }: POSItem) {
                       aria-label="DecrementMenuQuantity"
                       type="button"
                       roundedRight="0"
-                      onClick={() => pos.setQuantity(props, props.quantity > 1 ? props.quantity - 1 : 1)}
+                      onClick={() =>
+                        pos.setQuantity(props, props.quantity > 1 ? props.quantity - 1 : 1)
+                      }
                     >
                       <Minus />
                     </IconButton>
