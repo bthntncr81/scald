@@ -105,7 +105,10 @@ export default function Cart() {
               <OrderTypeRadioGroup
                 onChange={(value) => {
                   resetError('orderType');
-                  cart.changeType(value as 'delivery' | 'pickup', branding.business.deliveryCharge);
+                  cart.changeType(
+                    value as 'delivery' | 'pickup' | 'dine_in',
+                    branding.business.deliveryCharge
+                  );
                 }}
               />
 
