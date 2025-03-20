@@ -341,7 +341,7 @@ export default function EditPOSItem({ ...props }: POSItem) {
                             className="data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 select-none"
                           >
                             <Td className="text-sm w-full">
-                              <Checkbox
+                              {/* <Checkbox
                                 colorScheme="green"
                                 value={addon.id?.toString()}
                                 className="[&>span]:border-black/15"
@@ -351,19 +351,23 @@ export default function EditPOSItem({ ...props }: POSItem) {
                                   pos.selectAddon(addon, addonsSelected, setAddonsSelected)
                                 }
                               >
-                                <Text fontSize={14}>{t(addon.name)}</Text>
-                              </Checkbox>
+                              </Checkbox> */}
+
+                              <Text fontSize={14}>{t(addon.name)}</Text>
                             </Td>
 
                             <Td className="text-sm" w="150px">
                               <QuantityController
                                 stopSign={0}
                                 defaultValue={0}
+                                disabled={!addon.isAvailable}
                                 value={addonsSelected.find((v) => v.id === addon.id)?.quantity || 0}
-                                disabled={!addonsSelected.find((a) => a.id === addon.id)}
                                 onValueChange={(qnt) =>
-                                  pos.setAddonQty(addon.id, qnt, addonsSelected, setAddonsSelected)
+                                  pos.setAddonQty(addon, qnt, addonsSelected, setAddonsSelected)
                                 }
+                                decrementButtonClassName="text-black bg-white border border-black/15 rounded-full w-8 h-8 hover:text-white"
+                                incrementButtonClassName="text-black bg-white border border-black/15 rounded-full w-8 h-8 hover:text-white"
+                                className="font-medium"
                               />
                             </Td>
 
