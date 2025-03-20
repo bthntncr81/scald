@@ -129,13 +129,13 @@ export const POSCheckoutForm = () => {
     }
 
     // customer validation
-    // if (state.type === 'pickup') {
-    //   if (!branding?.business?.guestCheckout && !state?.customer?.id) {
-    //     errors.set('customer', 'Customer is required.');
-    //   }
-    // } else if (!state?.customer?.id) {
-    errors.set('customer', 'Customer is required.');
-    // }
+    if (state.type === 'dine_in') {
+      if (!branding?.business?.guestCheckout && !state?.customer?.id) {
+        errors.set('customer', 'Customer is required.');
+      }
+    } else if (!state?.customer?.id) {
+      errors.set('customer', 'Customer is required.');
+    }
 
     // Validate payment type
     if (!state.paymentType) {
