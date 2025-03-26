@@ -437,8 +437,6 @@ export default class OrdersController {
               .where('key', 'iyzico_ceppos')
               .andWhere('status', true)
               .firstOrFail();
-
-            console.log(paymentMethod);
             // paymentMethod üzerinden gerekli bilgileri alıyoruz
             const apiKey = paymentMethod.public; // Örneğin, API anahtarı
             const secretKey = paymentMethod!.secret; // Örneğin, gizli anahtar

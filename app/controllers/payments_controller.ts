@@ -148,6 +148,14 @@ export default class PaymentsController {
       console.log('----------------------------------------------------------- ');
       console.log('----------------------------------------------------------- ');
       if (data.length > 0) {
+        const paymentMethod = await PaymentMethod.query()
+          .where('key', 'iyzico_ceppos')
+          .andWhere('status', true)
+          .firstOrFail();
+        // paymentMethod üzerinden gerekli bilgileri alıyoruz
+        const apiKey = paymentMethod.public; // Örneğin, API anahtarı
+        const secretKey = paymentMethod!.secret; // Örneğin, gizli anahtar
+        const merchantId = paymentMethod!.webhook; // Örneğin, merchant ID
         const resp = await axios.post(
           'https://sandbox-api.iyzipay.com/v2/in-store/crypt/decrypt',
           {
@@ -156,9 +164,9 @@ export default class PaymentsController {
           },
           {
             headers: {
-              'x-api-key': 'sxNRebvUIZIhzHWR',
-              'x-secret-key': '9ikxN7OsAbeK9oMLvvI4zECCw9aAgM0x',
-              'x-merchant-id': 3398570,
+              'x-api-key': apiKey,
+              'x-secret-key': secretKey,
+              'x-merchant-id': merchantId,
             },
           }
         );
