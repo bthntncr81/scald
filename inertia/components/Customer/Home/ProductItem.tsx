@@ -32,7 +32,7 @@ export default function ProductItem(props: IProps) {
         <img
           src={image?.url}
           alt={name}
-          className="w-full  sm:h-[165px] object-cover rounded-lg mb-3 transition-all duration-100"
+          className="w-full  h-[165px] object-cover rounded-lg mb-3 transition-all duration-100"
           onError={(e) => (e.currentTarget.src = '/default_fallback.png')}
         />
 
