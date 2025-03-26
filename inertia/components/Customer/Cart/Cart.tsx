@@ -103,6 +103,7 @@ export default function Cart() {
             <div className="flex items-center gap-2 mb-6">
               {/* Select order type */}
               <OrderTypeRadioGroup
+                firstName={auth?.firstName}
                 onChange={(value) => {
                   resetError('orderType');
                   cart.changeType(

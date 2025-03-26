@@ -22,15 +22,6 @@ import fetcher from '@/lib/fetcher';
 import { toast } from 'sonner';
 import usePOS from '@/data/use_pos';
 
-const CheckoutFormSchema = Yup.object({
-  firstName: Yup.string().required('First name is required'),
-  lastName: Yup.string().required('Last name is required'),
-  email: Yup.string().email('Invalid email address').required('Full name is required'),
-  phoneNumber: Yup.string().required('Phone number is required'),
-  address: Yup.string().required('Address is required'),
-  paymentMethod: Yup.string().required('Payment method is required'),
-});
-
 export default function Checkout() {
   const { t } = useTranslation();
   const {
@@ -38,9 +29,41 @@ export default function Checkout() {
   } = usePage() as { props: PageProps };
 
   const { data: paymentMethods } = useSWR('/api/user/payment-methods', fetcher);
-
   const cart = usePOS();
-
+  const CheckoutFormSchema = Yup.object({
+    firstName: Yup.string().when([], {
+      is: () => cart.type === 'delivery',
+      then: (schema) => schema.required('First name is required'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    lastName: Yup.string().when([], {
+      is: () => cart.type === 'delivery',
+      then: (schema) => schema.required('Last name is required'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    email: Yup.string()
+      .email('Invalid email address')
+      .when([], {
+        is: () => cart.type === 'delivery',
+        then: (schema) => schema.required('Email is required'),
+        otherwise: (schema) => schema.notRequired(),
+      }),
+    phoneNumber: Yup.string().when([], {
+      is: () => cart.type === 'delivery',
+      then: (schema) => schema.required('Phone number is required'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    address: Yup.string().when([], {
+      is: () => cart.type === 'delivery',
+      then: (schema) => schema.required('Address is required'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+    paymentMethod: Yup.string().when([], {
+      is: () => cart.type === 'delivery',
+      then: (schema) => schema.required('Payment method is required'),
+      otherwise: (schema) => schema.notRequired(),
+    }),
+  });
   const checkoutInputs = [
     {
       type: 'group',
@@ -187,58 +210,58 @@ export default function Checkout() {
                   <h2 className="text-3xl">{t('Checkout')}</h2>
                 </div>
                 <div className="mb-10">
-                  <h4 className="mb-2">{t('Delivery address')}</h4>
-                  <div className="max-w-[460px] mb-10">
-                    <>
-                      {checkoutInputs.map((item, index) =>
-                        item.type === 'group' ? (
-                          <div key={index} className="grid grid-cols-2 gap-4 mb-4">
-                            {item.items?.map((subItem) => (
-                              <Field name={subItem.name} key={subItem.name}>
-                                {({ field, meta }: { field: any; meta: any }) => (
-                                  <FormControl isInvalid={!!(meta.touched && meta.error)}>
-                                    <Input
-                                      rounded="full"
-                                      type={subItem.type}
-                                      placeholder={t(subItem.placeholder)}
-                                      className="h-12 bg-white"
-                                      {...field}
-                                    />
-
-                                    <FormErrorMessage>{t(meta.error || '')}</FormErrorMessage>
-                                  </FormControl>
-                                )}
-                              </Field>
-                            ))}
-                          </div>
-                        ) : (
-                          <Field name={item.name} key={index}>
-                            {({ field, meta }: { field: any; meta: any }) => (
-                              <FormControl isInvalid={!!(meta.touched && meta.error)}>
-                                <Input
-                                  {...item}
-                                  rounded="full"
-                                  type={item.type}
-                                  placeholder={t(item.placeholder || '')}
-                                  className="h-12 bg-white mb-4"
-                                  {...field}
-                                />
-
-                                <FormErrorMessage>{t(meta.error || '')}</FormErrorMessage>
-                              </FormControl>
-                            )}
-                          </Field>
-                        )
-                      )}
-                    </>
-                  </div>
+                  {cart.type === 'delivery' && <h4 className="mb-2">{t('Delivery address')}</h4>}
+                  {cart.type === 'delivery' && (
+                    <div className="max-w-[460px] mb-10">
+                      <>
+                        {checkoutInputs.map((item, index) =>
+                          item.type === 'group' ? (
+                            <div key={index} className="grid grid-cols-2 gap-4 mb-4">
+                              {item.items?.map((subItem) => (
+                                <Field name={subItem.name} key={subItem.name}>
+                                  {({ field, meta }: { field: any; meta: any }) => (
+                                    <FormControl isInvalid={!!(meta.touched && meta.error)}>
+                                      <Input
+                                        rounded="full"
+                                        type={subItem.type}
+                                        placeholder={t(subItem.placeholder)}
+                                        className="h-12 bg-white"
+                                        {...field}
+                                      />
+                                      <FormErrorMessage>{t(meta.error || '')}</FormErrorMessage>
+                                    </FormControl>
+                                  )}
+                                </Field>
+                              ))}
+                            </div>
+                          ) : (
+                            <Field name={item.name} key={index}>
+                              {({ field, meta }: { field: any; meta: any }) => (
+                                <FormControl isInvalid={!!(meta.touched && meta.error)}>
+                                  <Input
+                                    {...item}
+                                    rounded="full"
+                                    type={item.type}
+                                    placeholder={t(item.placeholder || '')}
+                                    className="h-12 bg-white mb-4"
+                                    {...field}
+                                  />
+                                  <FormErrorMessage>{t(meta.error || '')}</FormErrorMessage>
+                                </FormControl>
+                              )}
+                            </Field>
+                          )
+                        )}
+                      </>
+                    </div>
+                  )}
                   <h4 className="mb-2">{t('Payment method')}</h4>
                   <div className="flex items-center gap-2">
                     <Field name="paymentMethod">
                       {({ field, meta, form }: { field: any; meta: any; form: any }) => (
                         <FormControl isInvalid={!!(meta.touched && meta.error)}>
                           <Flex className="gap-2">
-                            <Button
+                            {/* <Button
                               variant="outline"
                               colorScheme="outline"
                               data-selected={field.value === 'cash'}
@@ -249,23 +272,30 @@ export default function Checkout() {
                               }}
                             >
                               Cash
-                            </Button>
+                            </Button> */}
 
-                            {paymentMethods?.content?.map((item: Record<string, any>) => (
-                              <Button
-                                key={item.id}
-                                variant="outline"
-                                colorScheme="outline"
-                                data-selected={field.value === item.key}
-                                className={`h-12 uppercase border rounded-full px-8 data-[selected=true]:border-primary-400 data-[selected=true]:text-primary-400 border-secondary-200 hover:border-primary-400 hover:text-primary-400`}
-                                onClick={() => {
-                                  form.setFieldValue('paymentMethod', item.key);
-                                  cart.changePaymentType(item.key);
-                                }}
-                              >
-                                {item.name}
-                              </Button>
-                            ))}
+                            {paymentMethods?.content
+                              ?.filter(
+                                (item: any) =>
+                                  item.key === 'iyzico' ||
+                                  (item.key === 'iyzico_ceppos' &&
+                                    auth.firstName.toLowerCase().includes('kiosk'))
+                              )
+                              .map((item: Record<string, any>) => (
+                                <Button
+                                  key={item.id}
+                                  variant="outline"
+                                  colorScheme="outline"
+                                  data-selected={field.value === item.key}
+                                  className={`h-12 uppercase border rounded-full px-8 data-[selected=true]:border-primary-400 data-[selected=true]:text-primary-400 border-secondary-200 hover:border-primary-400 hover:text-primary-400`}
+                                  onClick={() => {
+                                    form.setFieldValue('paymentMethod', item.key);
+                                    cart.changePaymentType(item.key);
+                                  }}
+                                >
+                                  {t(item.name)}
+                                </Button>
+                              ))}
                           </Flex>
 
                           <FormErrorMessage>{t(meta.error || '')}</FormErrorMessage>
