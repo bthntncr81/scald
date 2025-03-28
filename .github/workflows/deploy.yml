@@ -10,22 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🛒 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🚀 Set up Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 22
           cache: 'npm'
 
-      - name: 📦 Install dependencies
+      - name: Install dependencies
         run: npm install
 
-      - name: 🛠️ Build Adonis.js App
+      - name: Build Adonis.js App
         run: npm run build
 
-      - name: 🔄 Deploy to Server (Multiple Instances)
+      - name: Deploy to Server
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -37,53 +37,40 @@ jobs:
               DB_NAME="resto_$i"
               PORT=$((4000 + i))
 
-              echo "🚀 Deploying to $PROJECT_PATH..."
+              echo "Deploying to $PROJECT_PATH..."
 
-              if [ ! -d "$PROJECT_PATH" ]; then
-                mkdir -p "$PROJECT_PATH"
-              fi
-              
+              mkdir -p "$PROJECT_PATH"
               cd "$PROJECT_PATH"
-
-              if [ -d "build/public/uploads" ]; then
-                mv build/public/uploads /tmp/uploads_backup_$i
-              fi
+              
+              [ -d "build/public/uploads" ] && mv build/public/uploads /tmp/uploads_backup_$i
 
               git pull origin main
               npm install
               npm run build
 
-              # Create .env file with proper EOF handling
-              cat > build/.env <<'END_ENV'
-TZ=UTC
-PORT=$PORT
-HOST=0.0.0.0
-LOG_LEVEL=info
-APP_KEY=z47xQ6yWG0Ju4Rv47VO70zP3cYUdjkLc
-NODE_ENV=production
-SESSION_DRIVER=cookie
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=resto_user
-DB_PASSWORD=Bthntncr81.
-DB_DATABASE=$DB_NAME
-DRIVE_DISK=fs
-SMTP_USERNAME=info@codius.solutions
-SMTP_PASSWORD=Codius2024.
-SMTP_HOST=smtpout.secureserver.net
-SMTP_PORT=465
-END_ENV
+              # SIMPLEST POSSIBLE .env CREATION
+              echo "TZ=UTC" > build/.env
+              echo "PORT=$PORT" >> build/.env
+              echo "HOST=0.0.0.0" >> build/.env
+              echo "LOG_LEVEL=info" >> build/.env
+              echo "APP_KEY=z47xQ6yWG0Ju4Rv47VO70zP3cYUdjkLc" >> build/.env
+              echo "NODE_ENV=production" >> build/.env
+              echo "SESSION_DRIVER=cookie" >> build/.env
+              echo "DB_HOST=localhost" >> build/.env
+              echo "DB_PORT=3306" >> build/.env
+              echo "DB_USER=resto_user" >> build/.env
+              echo "DB_PASSWORD=Bthntncr81." >> build/.env
+              echo "DB_DATABASE=$DB_NAME" >> build/.env
+              echo "DRIVE_DISK=fs" >> build/.env
+              echo "SMTP_USERNAME=info@codius.solutions" >> build/.env
+              echo "SMTP_PASSWORD=Codius2024." >> build/.env
+              echo "SMTP_HOST=smtpout.secureserver.net" >> build/.env
+              echo "SMTP_PORT=465" >> build/.env
 
-              # Fix variable substitution in .env file
-              sed -i "s/\$PORT/$PORT/g" build/.env
-              sed -i "s/\$DB_NAME/$DB_NAME/g" build/.env
-
-              if [ -d "/tmp/uploads_backup_$i" ]; then
-                mv /tmp/uploads_backup_$i build/public/uploads
-              fi
+              [ -d "/tmp/uploads_backup_$i" ] && mv /tmp/uploads_backup_$i build/public/uploads
 
               pm2 restart pos$i || pm2 start build/bin/server.js --name pos$i
               pm2 save
               
-              echo "✅ Deployment completed for $PROJECT_PATH (DB: $DB_NAME, PORT: $PORT)"
+              echo "Deployment completed for $PROJECT_PATH (DB: $DB_NAME, PORT: $PORT)"
             done
