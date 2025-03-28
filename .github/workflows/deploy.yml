@@ -25,7 +25,7 @@ jobs:
       - name: 🛠️ Build Adonis.js App
         run: npm run build
 
-        - name: 🔄 Deploy to Server (Multiple Instances)
+      - name: 🔄 Deploy to Server (Multiple Instances)
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_HOST }}
