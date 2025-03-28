@@ -34,33 +34,33 @@ jobs:
           script: |
             for i in {1..10}; do
               PROJECT_PATH="/var/www/html/scald_$i"
-              DB_NAME="resto_$i" # Dinamik DB adı
-              PORT=$((4000 + i))  # Farklı port numarası atanıyor
+              DB_NAME="resto_$i" # Dynamic DB name
+              PORT=$((4000 + i))  # Assigning a different port number
 
               echo "🚀 Deploying to $PROJECT_PATH..."
 
-              # 📂 Eğer proje klasörü yoksa oluştur
+              # 📂 If project folder doesn't exist, create it
               if [ ! -d "$PROJECT_PATH" ]; then
                 mkdir -p "$PROJECT_PATH"
               fi
               
               cd "$PROJECT_PATH"
 
-              # 📂 Uploads klasörünü yedekle
+              # 📂 Backup the uploads folder
               if [ -d "build/public/uploads" ]; then
                 mv build/public/uploads /tmp/uploads_backup_$i
               fi
 
-              # 📥 Güncellemeleri çek
+              # 📥 Pull updates
               git pull origin main
 
-              # 📦 Bağımlılıkları yükle
+              # 📦 Install dependencies
               npm install
 
-              # 🔨 Uygulamayı derle
+              # 🔨 Build the app
               npm run build
 
-              # 🗂️ .env dosyasını oluştur
+              # 🗂️ Create .env file
               cat <<EOF > build/.env
               TZ=UTC
               PORT=$PORT
@@ -81,12 +81,12 @@ jobs:
               SMTP_PORT=465
               EOF
 
-              # 🔄 Uploads klasörünü geri yükle
+              # 🔄 Restore the uploads folder
               if [ -d "/tmp/uploads_backup_$i" ]; then
                 mv /tmp/uploads_backup_$i build/public/uploads
               fi
 
-              # 🚀 Sunucuyu yeniden başlat
+              # 🚀 Restart server
               pm2 restart pos$i || pm2 start build/bin/server.js --name pos$i
               pm2 save
               
