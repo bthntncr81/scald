@@ -3,7 +3,7 @@ name: Deploy Adonis + Inertia App (Multiple Projects)
 on:
   push:
     branches:
-      - main # Change to your default branch
+      - main
 
 jobs:
   deploy:
@@ -34,60 +34,54 @@ jobs:
           script: |
             for i in {1..10}; do
               PROJECT_PATH="/var/www/html/scald_$i"
-              DB_NAME="resto_$i" # Dynamic DB name
-              PORT=$((4000 + i))  # Assigning a different port number
+              DB_NAME="resto_$i"
+              PORT=$((4000 + i))
 
               echo "🚀 Deploying to $PROJECT_PATH..."
 
-              # 📂 If project folder doesn't exist, create it
               if [ ! -d "$PROJECT_PATH" ]; then
                 mkdir -p "$PROJECT_PATH"
               fi
               
               cd "$PROJECT_PATH"
 
-              # 📂 Backup the uploads folder
               if [ -d "build/public/uploads" ]; then
                 mv build/public/uploads /tmp/uploads_backup_$i
               fi
 
-              # 📥 Pull updates
               git pull origin main
-
-              # 📦 Install dependencies
               npm install
-
-              # 🔨 Build the app
               npm run build
 
-              # 🗂️ Create .env file
-              cat <<EOF > build/.env
-              TZ=UTC
-              PORT=$PORT
-              HOST=0.0.0.0
-              LOG_LEVEL=info
-              APP_KEY=z47xQ6yWG0Ju4Rv47VO70zP3cYUdjkLc
-              NODE_ENV=production
-              SESSION_DRIVER=cookie
-              DB_HOST=localhost
-              DB_PORT=3306
-              DB_USER=resto_user
-              DB_PASSWORD=Bthntncr81.
-              DB_DATABASE=$DB_NAME
-              DRIVE_DISK=fs
-              SMTP_USERNAME=info@codius.solutions
-              SMTP_PASSWORD=Codius2024.
-              SMTP_HOST=smtpout.secureserver.net
-              SMTP_PORT=465
-              EOF
-             
+              # Create .env file with proper EOF handling
+              cat > build/.env <<'END_ENV'
+TZ=UTC
+PORT=$PORT
+HOST=0.0.0.0
+LOG_LEVEL=info
+APP_KEY=z47xQ6yWG0Ju4Rv47VO70zP3cYUdjkLc
+NODE_ENV=production
+SESSION_DRIVER=cookie
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=resto_user
+DB_PASSWORD=Bthntncr81.
+DB_DATABASE=$DB_NAME
+DRIVE_DISK=fs
+SMTP_USERNAME=info@codius.solutions
+SMTP_PASSWORD=Codius2024.
+SMTP_HOST=smtpout.secureserver.net
+SMTP_PORT=465
+END_ENV
 
-              # 🔄 Restore the uploads folder
+              # Fix variable substitution in .env file
+              sed -i "s/\$PORT/$PORT/g" build/.env
+              sed -i "s/\$DB_NAME/$DB_NAME/g" build/.env
+
               if [ -d "/tmp/uploads_backup_$i" ]; then
                 mv /tmp/uploads_backup_$i build/public/uploads
               fi
 
-              # 🚀 Restart server
               pm2 restart pos$i || pm2 start build/bin/server.js --name pos$i
               pm2 save
               
