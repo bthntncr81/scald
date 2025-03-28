@@ -61,7 +61,7 @@ jobs:
               npm run build
 
               # 🗂️ Create .env file
-              cat <<'EOF' > build/.env
+              cat <<EOF > build/.env
               TZ=UTC
               PORT=$PORT
               HOST=0.0.0.0
@@ -80,6 +80,7 @@ jobs:
               SMTP_HOST=smtpout.secureserver.net
               SMTP_PORT=465
               EOF
+             
 
               # 🔄 Restore the uploads folder
               if [ -d "/tmp/uploads_backup_$i" ]; then
