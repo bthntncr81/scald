@@ -1,4 +1,4 @@
-name: Deploy Adonis + Inertia App
+name: Deploy Adonis + Inertia App (Multiple Projects)
 
 on:
   push:
@@ -25,55 +25,70 @@ jobs:
       - name: 🛠️ Build Adonis.js App
         run: npm run build
 
-      - name: 🔄 Deploy to Server
+      - name: 🔄 Deploy to Server (Multiple Instances)
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /var/www/html/scald
+            for i in {1..10}; do
+              PROJECT_PATH="/var/www/html/scald_$i"
+              DB_NAME="resto_$i" # Dinamik DB adı
+              PORT=$((4000 + i))  # Farklı port numarası atanıyor
 
-            # 📂 Uploads klasörünü yedekle
-            if [ -d "build/public/uploads" ]; then
-              mv build/public/uploads /tmp/uploads_backup
-            fi
+              echo "🚀 Deploying to $PROJECT_PATH..."
 
-            # 📥 Güncellemeleri çek
-            git pull origin main
+              # 📂 Eğer proje klasörü yoksa oluştur
+              if [ ! -d "$PROJECT_PATH" ]; then
+                mkdir -p "$PROJECT_PATH"
+              fi
+              
+              cd "$PROJECT_PATH"
 
-            # 📦 Bağımlılıkları yükle
-            npm install
+              # 📂 Uploads klasörünü yedekle
+              if [ -d "build/public/uploads" ]; then
+                mv build/public/uploads /tmp/uploads_backup_$i
+              fi
 
-            # 🔨 Uygulamayı derle
-            npm run build
+              # 📥 Güncellemeleri çek
+              git pull origin main
 
-            # 🗂️ .env dosyasını oluştur
-            cat <<EOF > build/.env
-            TZ=UTC
-            PORT=8000
-            HOST=0.0.0.0
-            LOG_LEVEL=info
-            APP_KEY=z47xQ6yWG0Ju4Rv47VO70zP3cYUdjkLc
-            NODE_ENV=production
-            SESSION_DRIVER=cookie
-            DB_HOST=localhost
-            DB_PORT=3306
-            DB_USER=resto_user
-            DB_PASSWORD=Bthntncr81.
-            DB_DATABASE=resto
-            DRIVE_DISK=fs
-            SMTP_USERNAME=info@codius.solutions
-            SMTP_PASSWORD=Codius2024.
-            SMTP_HOST=smtpout.secureserver.net
-            SMTP_PORT=465
-            EOF
+              # 📦 Bağımlılıkları yükle
+              npm install
 
-            # 🔄 Uploads klasörünü geri yükle
-            if [ -d "/tmp/uploads_backup" ]; then
-              mv /tmp/uploads_backup build/public/uploads
-            fi
+              # 🔨 Uygulamayı derle
+              npm run build
 
-            # 🚀 Sunucuyu yeniden başlat
-            pm2 restart adonis-app || pm2 start build/bin/server.js --name adonis-app
-            pm2 save
+              # 🗂️ .env dosyasını oluştur
+              cat <<EOF > build/.env
+              TZ=UTC
+              PORT=$PORT
+              HOST=0.0.0.0
+              LOG_LEVEL=info
+              APP_KEY=z47xQ6yWG0Ju4Rv47VO70zP3cYUdjkLc
+              NODE_ENV=production
+              SESSION_DRIVER=cookie
+              DB_HOST=localhost
+              DB_PORT=3306
+              DB_USER=resto_user
+              DB_PASSWORD=Bthntncr81.
+              DB_DATABASE=$DB_NAME
+              DRIVE_DISK=fs
+              SMTP_USERNAME=info@codius.solutions
+              SMTP_PASSWORD=Codius2024.
+              SMTP_HOST=smtpout.secureserver.net
+              SMTP_PORT=465
+              EOF
+
+              # 🔄 Uploads klasörünü geri yükle
+              if [ -d "/tmp/uploads_backup_$i" ]; then
+                mv /tmp/uploads_backup_$i build/public/uploads
+              fi
+
+              # 🚀 Sunucuyu yeniden başlat
+              pm2 restart pos$i || pm2 start build/bin/server.js --name pos$i
+              pm2 save
+              
+              echo "✅ Deployment completed for $PROJECT_PATH (DB: $DB_NAME, PORT: $PORT)"
+            done
