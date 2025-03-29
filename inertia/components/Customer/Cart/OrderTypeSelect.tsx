@@ -66,13 +66,14 @@ export default function OrderTypeRadioGroup({
     props: { branding },
   } = usePage() as { props: PageProps };
 
-  const options = firstName!.toLowerCase().includes('kiosk')
-    ? [{ label: 'Pick-up', value: 'dine_in', disabled: !branding?.business?.dineIn }]
-    : [
-        { label: 'Pick-up', value: 'dine_in', disabled: !branding?.business?.dineIn },
-        { label: 'Delivery', value: 'delivery', disabled: !branding?.business?.delivery },
-        { label: 'Dine-in', value: 'pickup', disabled: !branding?.business?.pickup },
-      ];
+  const options =
+    firstName && firstName!.toLowerCase().includes('kiosk')
+      ? [{ label: 'Pick-up', value: 'dine_in', disabled: !branding?.business?.dineIn }]
+      : [
+          { label: 'Pick-up', value: 'dine_in', disabled: !branding?.business?.dineIn },
+          { label: 'Delivery', value: 'delivery', disabled: !branding?.business?.delivery },
+          { label: 'Dine-in', value: 'pickup', disabled: !branding?.business?.pickup },
+        ];
 
   // Find the first non-disabled option
   const defaultOption = (options.find((option) => !option.disabled)?.value ||

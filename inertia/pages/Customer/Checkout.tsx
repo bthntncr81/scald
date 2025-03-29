@@ -279,6 +279,8 @@ export default function Checkout() {
                                 (item: any) =>
                                   item.key === 'iyzico' ||
                                   (item.key === 'iyzico_ceppos' &&
+                                    auth &&
+                                    auth.firstName &&
                                     auth.firstName.toLowerCase().includes('kiosk'))
                               )
                               .map((item: Record<string, any>) => (
