@@ -2,7 +2,6 @@ import errorHandler from '#exceptions/error_handler';
 import MenuItem from '#models/menu_item';
 import Order from '#models/order';
 import axios from 'axios';
-
 import BusinessSetup from '#models/business_setup';
 import OrderItem from '#models/order_item';
 import PaymentMethod from '#models/payment_method';
@@ -425,9 +424,11 @@ export default class OrdersController {
               paymentInfo: JSON.stringify({}),
             })
             .save();
+          var dbName = process.env.DB_DATABASE || 'default_db'; // Eğer yoksa varsayılan değer kullan,
+          console.log(dbName);
           return response.json({
             success: true,
-            redirectUrl: 'https://pay.scald.shop?orderId=' + order.id,
+            redirectUrl: `https://pay.scald.shop?orderId=${order.id}&db_id=${dbName.replace('resto_', '')}`, // DB adını URL'ye ekledik
           });
         }
 
