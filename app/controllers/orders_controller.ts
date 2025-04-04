@@ -425,10 +425,9 @@ export default class OrdersController {
             })
             .save();
           var dbName = process.env.DB_DATABASE || 'default_db'; // Eğer yoksa varsayılan değer kullan,
-          console.log(dbName);
           return response.json({
             success: true,
-            redirectUrl: `https://pay.scald.shop?orderId=${order.id}&db_id=${dbName.replace('resto_', '')}`, // DB adını URL'ye ekledik
+            redirectUrl: `https://pay.scald.shop?orderId=${order.id}&db_id=${dbName.replace('resto_', '')}&user_id=${order.userId}`, // DB adını URL'ye ekledik
           });
         }
 
