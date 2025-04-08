@@ -9,6 +9,7 @@ import OrderFilter from '#models/filters/order_filter';
 import User from '#models/user';
 import formatPrecision from '../utils/format_precision.js';
 import OrderCharge from '#models/order_charge';
+import Table from './table.js';
 
 export default class Order extends compose(BaseModel, Filterable) {
   static $filter = () => OrderFilter;
@@ -21,6 +22,9 @@ export default class Order extends compose(BaseModel, Filterable) {
 
   @column()
   declare userId: number | null;
+
+  @column()
+  declare tableId: number | null;
 
   @column()
   declare type: 'dine_in' | 'delivery' | 'pickup';
@@ -106,6 +110,9 @@ export default class Order extends compose(BaseModel, Filterable) {
 
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>;
+
+  @belongsTo(() => Table)
+  declare table: BelongsTo<typeof Table>;
 
   @belongsTo(() => User, { foreignKey: 'deliveryManId' })
   declare deliveryMan: BelongsTo<typeof User>;

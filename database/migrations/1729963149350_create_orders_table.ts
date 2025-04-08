@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.increments('id');
       table.string('order_number').notNullable().unique();
       table.integer('user_id').unsigned().references('id').inTable('users').onDelete('SET NULL');
+      table.integer('table_id').unsigned().references('id').inTable('tables').onDelete('SET NULL');
       table.enum('type', ['dine_in', 'delivery', 'pickup']);
       table.integer('total_quantity').defaultTo(0).notNullable();
       table.double('total').defaultTo(0.0).notNullable();

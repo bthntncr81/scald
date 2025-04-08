@@ -15,6 +15,8 @@ import { middleware } from '#start/kernel';
 // Importing route files
 import '../app/routes/auth_route.js';
 import '../app/routes/addon_route.js';
+import '../app/routes/table_area.route.js';
+import '../app/routes/table_route.js';
 import '../app/routes/category_route.js';
 import '../app/routes/charge_route.js';
 import '../app/routes/coupon_route.js';
@@ -89,6 +91,11 @@ router
     router.on('/order-status/cancelled').renderInertia('Admin/OrderStatus/Cancelled');
     router.on('/settings').renderInertia('Admin/BusinessSetup');
     router.on('/menu-items').renderInertia('Admin/MenuItems');
+    router.on('/table-areas').renderInertia('Admin/TableAreas');
+    router.on('/table-pos/:tableId').renderInertia('Admin/TablePOS', {
+      tableId: (route: any) => route.param('tableId'),
+    });
+    router.on('/tables').renderInertia('Admin/Tables');
     router.on('/pos').renderInertia('Admin/POS');
     router.on('/earning-report').renderInertia('Admin/Reports/EarningReport');
     router.on('/order-report').renderInertia('Admin/Reports/OrderReports');
@@ -111,6 +118,11 @@ router
     router.on('/order-history').renderInertia('Admin/OrderHistory');
     router.on('/active-orders').renderInertia('Admin/ActiveOrders');
     router.on('/categories').renderInertia('Admin/Categories');
+    router.on('/table-areas').renderInertia('Admin/TableAreas');
+    router.on('/tables').renderInertia('Admin/Tables');
+    router.on('/table-pos/:tableId').renderInertia('Admin/TablePOS', {
+      tableId: (route: any) => route.param('tableId'),
+    });
     router.on('/addon-items').renderInertia('Admin/AddonItems');
     router.on('/tax-and-charges').renderInertia('Admin/TaxAndCharges');
     router.on('/order-status/pending').renderInertia('Admin/OrderStatus/Pending');
@@ -137,6 +149,11 @@ router
     router.on('/reservation-history').renderInertia('Admin/Reservations/ReservationHistory');
     router.on('/order-history').renderInertia('Admin/OrderHistory');
     router.on('/active-orders').renderInertia('Admin/ActiveOrders');
+    router.on('/table-areas').renderInertia('Admin/TableAreas');
+    router.on('/tables').renderInertia('Admin/Tables');
+    router.on('/table-pos/:tableId').renderInertia('Admin/TablePOS', {
+      tableId: (route: any) => route.param('tableId'),
+    });
     router.on('/order-status/pending').renderInertia('Admin/OrderStatus/Pending');
     router.on('/order-status/ready').renderInertia('Admin/OrderStatus/Ready');
     router.on('/order-status/processing').renderInertia('Admin/OrderStatus/Processing');

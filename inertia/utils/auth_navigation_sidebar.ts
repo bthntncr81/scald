@@ -189,7 +189,7 @@ export const AUTH_SIDEBAR: {
 
   // Menu management
   {
-    id: '8286adc5-dfc0-4468-8135-380f987e08d2',
+    id: '8286adc5-dfc0-4468-8135-380f987e08d12',
     groupTitle: 'Menu management',
     items: [
       {
@@ -230,7 +230,31 @@ export const AUTH_SIDEBAR: {
       },
     ],
   },
+  {
+    id: '8286adc5-dfc0-4468-8135-380f987e08d2',
+    groupTitle: 'Table Management',
+    items: [
+      {
+        id: '26c7db50-af48-4a63-8dd0-913ab3b3283axx',
+        key: 'tables',
+        title: 'Tables',
+        href: '/tables',
+        leftIcon: MenuBoard,
+        isActive: (currentPath: string) => currentPath === 'tables',
+        role: [ROLE.ADMIN, ROLE.MANAGER],
+      },
 
+      {
+        id: '26c7db50-af48-4a63-8dd0-913ab3b3283axy',
+        key: 'table-areas',
+        title: 'Table Areas',
+        href: '/table-areas',
+        leftIcon: MenuBoard,
+        isActive: (currentPath: string) => currentPath === 'table-areas',
+        role: [ROLE.ADMIN, ROLE.MANAGER],
+      },
+    ],
+  },
   // Promotions
   {
     id: 'b5d36312-d872-4edc-a04e-5ae22e259154',
