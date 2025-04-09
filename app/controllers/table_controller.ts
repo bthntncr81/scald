@@ -2,6 +2,7 @@ import { HttpContext } from '@adonisjs/core/http';
 import Table from '#models/table'; // Make sure the path is correct
 import errorHandler from '#exceptions/error_handler';
 import { tableValidator } from '#validators/table';
+import Order from '#models/order';
 
 export default class TablesController {
   // List all tables with pagination
@@ -43,12 +44,27 @@ export default class TablesController {
         };
         formattedData.data.push(obj);
       });
-      console.log(formattedData);
 
       // Yeni formatta sadece veriyi döndürelim
       return response.json(formattedData);
     } catch (error) {
       errorHandler(error, response, logger, 'Index Tables Error');
+    }
+  }
+  // Get unpaid orders by Table ID
+  async getOrdersByTableId({ logger, request, response }: HttpContext) {
+    const { id } = request.params();
+
+    try {
+      const orders = await Order.query()
+        .where('table_id', id)
+        .andWhere('payment_status', false)
+        .preload('orderItems') // opsiyonel: ilişkili verileri yüklemek istersen
+        .orderBy('created_at', 'desc');
+
+      return response.json(orders);
+    } catch (error) {
+      errorHandler(error, response, logger, 'Get Orders By Table Id Error');
     }
   }
   // Get table by ID

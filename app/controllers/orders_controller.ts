@@ -308,11 +308,36 @@ export default class OrdersController {
       errorHandler(error, response, logger, 'Calculating order Error');
     }
   }
+  async updatePaymentStatus({ logger, response, request }: HttpContext) {
+    try {
+      // Request body'den gelen veriyi alıyoruz
+      const { orderIds, paymentType } = request.only(['orderIds', 'paymentType']);
 
+      // orderIds dizisindeki siparişleri buluyoruz
+      const orders = await Order.query().whereIn('id', orderIds);
+
+      if (orders.length === 0) {
+        return response.status(404).json({ message: 'No orders found for the given IDs.' });
+      }
+
+      // Her siparişi güncelliyoruz
+      for (const order of orders) {
+        order.paymentStatus = true; // payment_status değerini 1 yapıyoruz
+        order.paymentType = paymentType; // payment_type değerini gönderilen objeden alıyoruz
+        await order.save(); // Veritabanında güncelleme yapıyoruz
+      }
+
+      return response.json({ message: 'Orders updated successfully' });
+    } catch (error) {
+      logger.error('Error updating orders:', error);
+      return response
+        .status(500)
+        .json({ message: 'Failed to update orders', error: error.message });
+    }
+  }
   async store({ logger, request, response, auth }: HttpContext) {
     try {
       const payload = await request.validateUsing(orderValidator);
-      console.log(payload.paymentType);
       if (auth.user!.roleId === Roles.CUSTOMER && auth.user!.id !== payload.userId) {
         return response.badRequest({
           success: false,
@@ -357,7 +382,7 @@ export default class OrdersController {
         totalTax,
         totalCharges,
         paymentStatus:
-          restPayload.type === 'delivery' || restPayload.type === 'pickup' ? false : true,
+          restPayload.type === 'delivery' || restPayload.type === 'dine_in' ? false : true,
         discount: discount,
         manualDiscount: payload.manualDiscount || 0,
         deliveryCharge,
@@ -425,7 +450,6 @@ export default class OrdersController {
             })
             .save();
           var dbName = process.env.DB_DATABASE || 'default_db'; // Eğer yoksa varsayılan değer kullan,
-          console.log(dbName);
           return response.json({
             success: true,
             redirectUrl: `https://pay.scald.shop?orderId=${order.id}&db_id=${dbName.replace('resto_', '')}`, // DB adını URL'ye ekledik
@@ -468,7 +492,6 @@ export default class OrdersController {
           } catch (error) {
             console.error('Ödeme hatası:', error.response?.data || error.message);
           }
-          console.log('return işlemi çalışacak!');
         }
       }
 

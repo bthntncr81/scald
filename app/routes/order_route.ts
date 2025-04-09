@@ -26,6 +26,7 @@ router
     router.get('/count/status', [OrdersController, 'orderStatusCount']);
     router.post('/', [OrdersController, 'store']);
     router.post('/calculate', [OrdersController, 'calculate']);
+    router.post('/updatePaymentStatus', [OrdersController, 'updatePaymentStatus']);
     router.put('/:id', [OrdersController, 'update']);
     router.patch('/bulk/update', [OrdersController, 'bulkCustomUpdate']);
     router.delete('/:id', [OrdersController, 'delete']);

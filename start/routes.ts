@@ -92,9 +92,8 @@ router
     router.on('/settings').renderInertia('Admin/BusinessSetup');
     router.on('/menu-items').renderInertia('Admin/MenuItems');
     router.on('/table-areas').renderInertia('Admin/TableAreas');
-    router.on('/table-pos/:tableId').renderInertia('Admin/TablePOS', {
-      tableId: (route: any) => route.param('tableId'),
-    });
+    router.on('/table-pos').renderInertia('Admin/TablePOS');
+
     router.on('/tables').renderInertia('Admin/Tables');
     router.on('/pos').renderInertia('Admin/POS');
     router.on('/earning-report').renderInertia('Admin/Reports/EarningReport');
@@ -120,9 +119,8 @@ router
     router.on('/categories').renderInertia('Admin/Categories');
     router.on('/table-areas').renderInertia('Admin/TableAreas');
     router.on('/tables').renderInertia('Admin/Tables');
-    router.on('/table-pos/:tableId').renderInertia('Admin/TablePOS', {
-      tableId: (route: any) => route.param('tableId'),
-    });
+    router.on('/table-pos').renderInertia('Admin/TablePOS');
+
     router.on('/addon-items').renderInertia('Admin/AddonItems');
     router.on('/tax-and-charges').renderInertia('Admin/TaxAndCharges');
     router.on('/order-status/pending').renderInertia('Admin/OrderStatus/Pending');
@@ -151,9 +149,7 @@ router
     router.on('/active-orders').renderInertia('Admin/ActiveOrders');
     router.on('/table-areas').renderInertia('Admin/TableAreas');
     router.on('/tables').renderInertia('Admin/Tables');
-    router.on('/table-pos/:tableId').renderInertia('Admin/TablePOS', {
-      tableId: (route: any) => route.param('tableId'),
-    });
+    router.on('/table-pos').renderInertia('Admin/TablePOS');
     router.on('/order-status/pending').renderInertia('Admin/OrderStatus/Pending');
     router.on('/order-status/ready').renderInertia('Admin/OrderStatus/Ready');
     router.on('/order-status/processing').renderInertia('Admin/OrderStatus/Processing');

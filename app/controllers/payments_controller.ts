@@ -138,15 +138,6 @@ export default class PaymentsController {
       const data = request.input('data');
       const token = request.input('paymentSessionToken');
 
-      console.log('----------------------------------------------------------- ');
-      console.log('----------------------------------------------------------- ');
-      console.log('----------------------------------------------------------- ');
-
-      console.log(data);
-
-      console.log('----------------------------------------------------------- ');
-      console.log('----------------------------------------------------------- ');
-      console.log('----------------------------------------------------------- ');
       if (data.length > 0) {
         const paymentMethod = await PaymentMethod.query()
           .where('key', 'iyzico_ceppos')
@@ -173,15 +164,6 @@ export default class PaymentsController {
 
         const order = await Order.query().where('id', orderId).firstOrFail();
 
-        console.log('----------------------------------------------------------- ');
-        console.log('----------------------------------------------------------- ');
-        console.log('----------------------------------------------------------- ');
-
-        console.log(resp.data);
-
-        console.log('----------------------------------------------------------- ');
-        console.log('----------------------------------------------------------- ');
-        console.log('----------------------------------------------------------- ');
         if (
           resp.data.inStoreCompleteOperation &&
           !resp.data.inStoreCompleteOperation.paymentFailedResult
@@ -199,7 +181,6 @@ export default class PaymentsController {
           transmit.broadcast('orders', { success: true });
           return response.redirect('/confirm');
         } else {
-          console.log(resp.data.inStoreCompleteOperation.paymentFailedResult);
           order
             .merge({
               paymentStatus: false,

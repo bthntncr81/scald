@@ -12,7 +12,15 @@ export const orderValidator = vine.compile(
         );
       })
       .optional()
-      .requiredWhen('type', '!=', 'dine_in'),
+      .requiredWhen('type', '=', 'pickup'),
+
+    tableId: vine
+      .number()
+      .exists(async (db, value) => {
+        return db.from('tables').where('id', value).andWhere('id', '>', 0).first() || false;
+      })
+      .optional()
+      .requiredWhen('type', '=', 'dine_in'),
     type: vine.enum(['dine_in', 'delivery', 'pickup']),
     manualDiscount: vine.number().optional(),
     paymentType: vine.enum(['cash', 'card', 'paypal', 'stripe', 'iyzico', 'iyzico_ceppos']),

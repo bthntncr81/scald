@@ -55,9 +55,11 @@ type OrderType = 'dine_in' | 'delivery' | 'pickup';
 
 // render order type selection button group
 export default function OrderTypeRadioGroup({
+  isTable,
   defaultValue,
   onChange,
 }: {
+  isTable?: boolean;
   defaultValue: string;
   onChange?: (nextValue: OrderType) => void;
 }) {
@@ -66,11 +68,13 @@ export default function OrderTypeRadioGroup({
     props: { branding },
   } = usePage() as { props: PageProps };
 
-  const options = [
-    { label: 'Pick-up', value: 'dine_in', disabled: !branding?.business?.dineIn },
-    { label: 'Delivery', value: 'delivery', disabled: !branding?.business?.delivery },
-    { label: 'Dine-in', value: 'pickup', disabled: !branding?.business?.pickup },
-  ];
+  const options = isTable
+    ? [{ label: 'Dine-in', value: 'dine_in', disabled: !branding?.business?.pickup }]
+    : [
+        { label: 'Pick-up', value: 'pickup', disabled: !branding?.business?.dineIn },
+        { label: 'Delivery', value: 'delivery', disabled: !branding?.business?.delivery },
+        { label: 'Dine-in', value: 'dine_in', disabled: !branding?.business?.pickup },
+      ];
 
   // Find the first non-disabled option
   const defaultOption = (options.find((option) => !option.disabled)?.value ||

@@ -198,6 +198,7 @@ export const TablePOSCheckoutForm = ({
           <Flex flexDir="column" gap="2">
             <label>{t('Select order type')}</label>
             <OrderTypeRadioGroup
+              isTable={true}
               defaultValue={pos.type}
               onChange={(value) => {
                 resetError('orderType');
@@ -213,7 +214,7 @@ export const TablePOSCheckoutForm = ({
           </Flex>
 
           {/* Table selection (only shown for dine-in orders) */}
-          {pos.type === 'dine_in' && (
+          {/* {pos.type === 'pickup' && (
             <Flex flexDir="column" gap="2">
               <label>{t('Select Table')}</label>
               <Select
@@ -243,7 +244,7 @@ export const TablePOSCheckoutForm = ({
                 <Text className="text-sm text-red-500">{t(errors.get('table') as 'string')}</Text>
               ) : null}
             </Flex>
-          )}
+          )} */}
 
           {/* Order note */}
           <div>

@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import DeleteTable from '@/components/Admin/Tables/DeleteTable';
 import EditTable from '@/components/Admin/Tables/EditTable';
 import NewTable from '@/components/Admin/Tables/NewTable';
+import ActiveOrdersDrawer from '@/components/Admin/Tables/Orders';
 
 export default function Tables() {
   const { t } = useTranslation();
@@ -29,8 +30,8 @@ export default function Tables() {
   const {
     props: { auth },
   } = usePage() as { props: PageProps };
-  const handleTableClick = (tableId: number) => {
-    window.location.href = `/admin/table-pos/${tableId}`; // Navigate directly to the TablePOS page
+  const handleTableClick = (tableId: number, tableNumber: number, tableAreaName: string) => {
+    window.location.href = `/admin/table-pos?id=${tableId}&number=${tableNumber}&name=${tableAreaName}`; // Navigate directly to the TablePOS page
   };
 
   useEffect(() => {
@@ -111,10 +112,12 @@ export default function Tables() {
           {filteredItems.map((table: any) => (
             <div
               key={table.id}
-              onClick={() => handleTableClick(table.id)} // Navigate on click
               className="bg-white p-4 rounded-lg shadow-lg border border-gray-200"
             >
-              <div className="flex justify-between items-center">
+              <div
+                onClick={() => handleTableClick(table.id, table.number, table.tableAreaName)} // Navigate on click
+                className="flex justify-between items-center"
+              >
                 <h3 className="text-lg font-semibold">
                   {t('Table')} #{table.number}
                 </h3>
@@ -122,6 +125,7 @@ export default function Tables() {
               </div>
               <div className="mt-4 flex justify-between items-center">
                 <DeleteTable id={table.id} refresh={refresh} />
+                <ActiveOrdersDrawer tableId={table.id} />
                 <EditTable table={table} refresh={refresh} />
               </div>
             </div>

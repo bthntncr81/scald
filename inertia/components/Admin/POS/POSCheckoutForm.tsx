@@ -129,7 +129,7 @@ export const POSCheckoutForm = () => {
     }
 
     // customer validation
-    if (state.type === 'dine_in') {
+    if (state.type === 'pickup') {
       if (!branding?.business?.guestCheckout && !state?.customer?.id) {
         errors.set('customer', 'Customer is required.');
       }

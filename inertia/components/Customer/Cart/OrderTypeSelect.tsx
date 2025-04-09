@@ -68,11 +68,11 @@ export default function OrderTypeRadioGroup({
 
   const options =
     firstName && firstName!.toLowerCase().includes('kiosk')
-      ? [{ label: 'Pick-up', value: 'dine_in', disabled: !branding?.business?.dineIn }]
+      ? [{ label: 'Pick-up', value: 'pickup', disabled: !branding?.business?.dineIn }]
       : [
-          { label: 'Pick-up', value: 'dine_in', disabled: !branding?.business?.dineIn },
+          { label: 'Pick-up', value: 'pickup', disabled: !branding?.business?.dineIn },
           { label: 'Delivery', value: 'delivery', disabled: !branding?.business?.delivery },
-          { label: 'Dine-in', value: 'pickup', disabled: !branding?.business?.pickup },
+          { label: 'Dine-in', value: 'dine_in', disabled: !branding?.business?.pickup },
         ];
 
   // Find the first non-disabled option

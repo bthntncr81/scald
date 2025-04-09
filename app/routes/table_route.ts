@@ -17,6 +17,7 @@ router
   .group(() => {
     router.get('/', [TablesController, 'index']);
     router.get('/:id', [TablesController, 'getById']);
+    router.get('getOrdersByTableId/:id', [TablesController, 'getOrdersByTableId']);
     router.post('/', [TablesController, 'store']);
     router.put('/:id', [TablesController, 'update']);
     router.delete('/:id', [TablesController, 'delete']);

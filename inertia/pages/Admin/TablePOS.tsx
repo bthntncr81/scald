@@ -39,13 +39,19 @@ export default function POS() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const windowSize = useWindowSize();
 
-  // Access URL parameters using Inertia's usePage hook
+  // URL'den 'id' parametresini al
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTableId = urlParams.get('id'); // URL'deki 'id' parametresini al
+  const urlTableAreaName = urlParams.get('name'); // URL'deki 'id' parametresini al
+  const urlTableNumber = urlParams.get('number'); // URL'deki 'id' parametresini al
+
+  // Inertia props'dan gelen tableId ile URL'den alınan id'yi birleştir
   const {
-    props: { tableId, tableNumber, tableArea },
+    props: { tableId },
   } = usePage<PageProps & { tableId?: string; tableNumber?: string; tableArea?: string }>();
 
-  // If tableId is not available from props, use the tableId from the URL
-  const urlTableId = window.location.pathname.split('/').pop();
+  // URL parametresi varsa onu, yoksa Inertia props'dan gelen tableId'yi kullan
+  const finalTableId = urlTableId || tableId;
 
   const categorySearchedText = useDebounce(categorySearchText, 300);
   const searchedMenuItemText = useDebounce(searchMenuItem, 300);
@@ -178,9 +184,9 @@ export default function POS() {
               <span>{t('Category')}</span>
             </Button>
           )}
-          {urlTableId && (
+          {finalTableId && (
             <Badge colorScheme="blue" fontSize="md" p={2} borderRadius="md">
-              {t('Table')}: #{tableNumber} ({tableArea})
+              {t('Table')}: #{urlTableNumber} ({urlTableAreaName})
             </Badge>
           )}
           <InputGroup className="flex-1">
@@ -230,7 +236,7 @@ export default function POS() {
         <div className="flex w-full">
           {renderPOSItems(menuItems)}
           <TablePOSCheckoutForm
-            selectedTableId={urlTableId || tableId!}
+            selectedTableId={finalTableId || tableId!}
             tables={[]}
             isTablesLoading={false}
             onTableSelect={function (tableId: string | null): void {
