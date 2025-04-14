@@ -32,7 +32,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            for i in {1..10}; do
+            for i in {1..3}; do
               PROJECT_PATH="/var/www/html/scald_$i"
               DB_NAME="resto_$i"
               PORT=$((4000 + i))
@@ -68,9 +68,6 @@ jobs:
               echo "SMTP_PORT=465" >> build/.env
 
               [ -d "/tmp/uploads_backup_$i" ] && mv /tmp/uploads_backup_$i build/public/uploads
-
-              pm2 restart pos$i || pm2 start build/bin/server.js --name pos$i
-              pm2 save
               
               echo "Deployment completed for $PROJECT_PATH (DB: $DB_NAME, PORT: $PORT)"
             done

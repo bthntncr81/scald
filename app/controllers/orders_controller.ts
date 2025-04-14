@@ -452,7 +452,7 @@ export default class OrdersController {
           var dbName = process.env.DB_DATABASE || 'default_db'; // Eğer yoksa varsayılan değer kullan,
           return response.json({
             success: true,
-            redirectUrl: `https://pay.scald.shop?orderId=${order.id}&db_id=${dbName.replace('resto_', '')}`, // DB adını URL'ye ekledik
+            redirectUrl: `https://pay.posfix.shop?orderId=${order.id}&db_id=${dbName.replace('resto_', '')}`, // DB adını URL'ye ekledik
           });
         }
 
@@ -479,7 +479,7 @@ export default class OrdersController {
                   'x-secret-key': secretKey,
                   'x-merchant-id': merchantId,
                   'x-callback-url':
-                    'scald://https://scald.shop/payments/iyzico/success/' + order.id,
+                    'posfix://https://posfix.shop/payments/iyzico/success/' + order.id,
                   'Content-Type': 'application/json',
                 },
               }
