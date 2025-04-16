@@ -35,6 +35,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            sudo apt-get update && sudo apt-get install -y jq
             TMP_DIR="/tmp/env_backups"
             API_URL="https://restapi.posfixmenu.com/api/Project/GetAllProject"
             mkdir -p "$TMP_DIR"
