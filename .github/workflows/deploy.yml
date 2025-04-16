@@ -59,6 +59,7 @@ jobs:
               # .env dosyasını geri taşı
               [ -f "$TMP_DIR/.env_$project" ] && mv "$TMP_DIR/.env_$project" build/.env
               [ -d "/tmp/uploads_backup_$project" ] && mv "/tmp/uploads_backup_$project" build/public/uploads
+              pm2 restart $project || pm2 start build/server.js --name "$project"
 
               echo "Deployment completed for $PROJECT_PATH (DB: $DB_NAME)"
             done
