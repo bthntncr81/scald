@@ -22,9 +22,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Build Adonis.js App
         run: npm run build
 
@@ -35,12 +32,11 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            sudo apt-get update && sudo apt-get install -y jq
             TMP_DIR="/tmp/env_backups"
-            API_URL="https://restapi.posfixmenu.com/api/Project/GetAllProject"
             mkdir -p "$TMP_DIR"
 
-            projects=$(curl -s "$API_URL" | jq -r '.data[]')
+            raw=$(curl -s https://restapi.posfixmenu.com/api/Project/GetAllProject)
+            projects=$(echo $raw | tr ',' ' ')
 
             for project in $projects; do
               PROJECT_PATH="/var/www/html/$project"
