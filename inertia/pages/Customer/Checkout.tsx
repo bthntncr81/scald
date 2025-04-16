@@ -21,35 +21,36 @@ import useSWR from 'swr';
 import fetcher from '@/lib/fetcher';
 import { toast } from 'sonner';
 import usePOS from '@/data/use_pos';
+import { table } from 'console';
 
 export default function Checkout() {
   const { t } = useTranslation();
   const {
     props: { auth },
   } = usePage() as { props: PageProps };
-
+  const tableId = localStorage.getItem('tableId');
   const { data: paymentMethods } = useSWR('/api/user/payment-methods', fetcher);
   const cart = usePOS();
   const CheckoutFormSchema = Yup.object({
     firstName: Yup.string().when([], {
-      is: () => cart.type === 'delivery',
+      is: () => cart.type === 'delivery' || tableId,
       then: (schema) => schema.required('First name is required'),
       otherwise: (schema) => schema.notRequired(),
     }),
     lastName: Yup.string().when([], {
-      is: () => cart.type === 'delivery',
+      is: () => cart.type === 'delivery' || tableId,
       then: (schema) => schema.required('Last name is required'),
       otherwise: (schema) => schema.notRequired(),
     }),
     email: Yup.string()
       .email('Invalid email address')
       .when([], {
-        is: () => cart.type === 'delivery',
+        is: () => cart.type === 'delivery' || tableId,
         then: (schema) => schema.required('Email is required'),
         otherwise: (schema) => schema.notRequired(),
       }),
     phoneNumber: Yup.string().when([], {
-      is: () => cart.type === 'delivery',
+      is: () => cart.type === 'delivery' || tableId,
       then: (schema) => schema.required('Phone number is required'),
       otherwise: (schema) => schema.notRequired(),
     }),
@@ -59,7 +60,7 @@ export default function Checkout() {
       otherwise: (schema) => schema.notRequired(),
     }),
     paymentMethod: Yup.string().when([], {
-      is: () => cart.type === 'delivery',
+      is: () => true,
       then: (schema) => schema.required('Payment method is required'),
       otherwise: (schema) => schema.notRequired(),
     }),
@@ -88,7 +89,7 @@ export default function Checkout() {
       name: 'email',
       type: 'email',
       placeholder: 'Enter your email address',
-      disabled: true,
+      disabled: tableId ? false : true,
     },
     {
       label: 'Phone',
@@ -105,16 +106,15 @@ export default function Checkout() {
   ];
 
   useEffect(() => {
-    if (!auth) {
-      router.visit('/login');
+    if (!auth && !tableId) {
+      window.location.href = window.location.origin + '/login';
     }
   }, []);
 
   const resetCartState = () => {
     cart.resetPOS();
   };
-
-  if (!auth) {
+  if (!auth && !tableId) {
     return (
       <CustomerLayout>
         <div className="flex flex-col items-center justify-center h-screen">
@@ -123,28 +123,32 @@ export default function Checkout() {
       </CustomerLayout>
     );
   }
-
   return (
     <CustomerLayout>
       <Formik
         initialValues={{
-          firstName: auth.firstName || '',
-          lastName: auth.lastName || '',
-          email: auth.email || 'initialEmail',
-          phoneNumber: auth.phoneNumber || '',
-          address: auth.address || '',
+          firstName: auth ? auth.firstName : '',
+          lastName: auth ? auth.lastName : '',
+          email: auth ? auth.email : '',
+          phoneNumber: auth ? auth.phoneNumber : '',
+          address: auth ? auth.address : '',
           paymentMethod: '',
         }}
         validationSchema={CheckoutFormSchema}
         onSubmit={async (values, actions) => {
           // Format the data for submission
           const formattedData = {
-            userId: auth?.id,
+            userId: tableId ? null : auth?.id,
+            tableId: tableId ? tableId : null,
             discount: cart.discount,
-            type: cart?.type,
+            type: tableId ? 'dine_in' : cart?.type,
             paymentType: values?.paymentMethod,
             customerNote: cart.note,
             paymentStatus: false,
+            customerName: tableId ? values.firstName + ' ' + values.lastName : '',
+            customerAddresss: !auth ? values.address : '',
+            customerNumber: !auth ? values.phoneNumber : '',
+            customerMail: !auth ? values.email : '',
             deliveryDate: new Date().toISOString().split('T')[0],
             orderItems:
               cart.POSItems.map((item) => ({
@@ -166,8 +170,28 @@ export default function Checkout() {
 
           try {
             // update user data
-            const { data, status } = await axios.put('/api/users/profile/update', values);
-            if ((data?.success && status === 200) || status === 201) {
+
+            if (auth) {
+              const { data, status } = await axios.put('/api/users/profile/update', values);
+              if ((data?.success && status === 200) || status === 201) {
+                // Create order
+                const { data: orderResponseData } = await axios.post(
+                  '/api/user/orders',
+                  formattedData
+                );
+
+                if (orderResponseData?.success && formattedData?.paymentType === 'cash') {
+                  // reset and cart redirect to success page
+                  resetCartState();
+                  router.visit('/confirm');
+                }
+                if (orderResponseData?.success && formattedData?.paymentType !== 'cash') {
+                  // reset and redirect to payment gateway
+                  resetCartState();
+                  window.location.href = orderResponseData?.redirectUrl;
+                }
+              }
+            } else {
               // Create order
               const { data: orderResponseData } = await axios.post(
                 '/api/user/orders',
@@ -211,7 +235,7 @@ export default function Checkout() {
                 </div>
                 <div className="mb-10">
                   {cart.type === 'delivery' && <h4 className="mb-2">{t('Delivery address')}</h4>}
-                  {cart.type === 'delivery' && (
+                  {(cart.type === 'delivery' || tableId) && (
                     <div className="max-w-[460px] mb-10">
                       <>
                         {checkoutInputs.map((item, index) =>
@@ -234,7 +258,8 @@ export default function Checkout() {
                                 </Field>
                               ))}
                             </div>
-                          ) : (
+                          ) : // 👇 sadece adres inputuysa ve cart tipi delivery değilse render etme
+                          item.name === 'address' && cart.type !== 'delivery' ? null : (
                             <Field name={item.name} key={index}>
                               {({ field, meta }: { field: any; meta: any }) => (
                                 <FormControl isInvalid={!!(meta.touched && meta.error)}>

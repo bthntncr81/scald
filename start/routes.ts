@@ -57,13 +57,19 @@ router.group(() => {
 // User routes
 router
   .group(() => {
-    router.on('/checkout').renderInertia('Customer/Checkout');
     router.on('/my-profile').renderInertia('Customer/Profile/MyProfile');
     router.on('/my-orders').renderInertia('Customer/Profile/MyOrders');
   })
   .prefix('/user')
   .use(middleware.auth({ guards: ['web'] }))
   .use(middleware.role({ guards: ['customer'] }))
+  .use(middleware.maintenance());
+
+router
+  .group(() => {
+    router.on('/checkout').renderInertia('Customer/Checkout');
+  })
+  .prefix('/user')
   .use(middleware.maintenance());
 
 // Admin routes

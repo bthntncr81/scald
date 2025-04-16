@@ -60,6 +60,8 @@ export default function OrderDetailsSidebar({
   const { t } = useTranslation();
   const [status, setStatus] = React.useState<TOrderStatus>(orderStatus.getStatusDetails('pending'));
   const [customerNote, setCustomerNote] = React.useState('');
+  const [customerName, setcustomerName] = React.useState('');
+  const [customerAddress, setcustomerAddress] = React.useState('');
   const [orderType, setOrderType] = React.useState<OrderType>();
   const [paymentType, setPaymentType] = React.useState<PaymentType>();
   const [paymentStatus, setPaymentStatus] = React.useState<boolean>();
@@ -121,6 +123,8 @@ export default function OrderDetailsSidebar({
       setStatus(orderStatus.getStatusDetails(orderItem.status));
       setOrderType(orderItem.type);
       setCustomerNote(orderItem.customerNote ?? '');
+      setcustomerAddress(orderItem.customerAddress ?? '');
+      setcustomerName(orderItem.customerName ?? '');
       setPaymentType(orderItem.paymentType);
       setDeliveryDate(new Date(orderItem.deliveryDate).toISOString().split('T')[0]);
       setPaymentStatus(Boolean(orderItem.paymentStatus));
@@ -150,6 +154,8 @@ export default function OrderDetailsSidebar({
       discountType: discount.type,
       paymentType: paymentType,
       customerNote: customerNote,
+      customerName: customerName,
+      customerAddress: customerAddress,
       paymentStatus: paymentStatus,
       deliveryDate: deliveryDate,
       status: status.value,
@@ -367,10 +373,10 @@ export default function OrderDetailsSidebar({
               {/* User note */}
               <div className="mt-3 mb-4">
                 <div className="flex flex-col space-y-2">
-                  <Text className="text-base font-normal text-secondary-400">
+                  {/* <Text className="text-base font-normal text-secondary-400">
                     {t('Order note')}
-                  </Text>
-                  {status.value !== 'pending' ? (
+                  </Text> */}
+                  {/* {status.value !== 'pending' ? (
                     <Text>
                       {customerNote || <span className="text-secondary-500"> {t('Empty')}</span>}
                     </Text>
@@ -380,7 +386,35 @@ export default function OrderDetailsSidebar({
                       onChange={(e) => setCustomerNote(e.target.value)}
                       placeholder={t('Write customer note')}
                     />
-                  )}
+                  )} */}
+                  {customerName != '' ? (
+                    <div className="d-flex">
+                      <div>
+                        <Text className="text-base font-normal text-secondary-400">
+                          {t('Order Note')}
+                        </Text>
+                      </div>
+                      <div> {customerName}</div>
+                    </div>
+                  ) : null}
+                  {customerName != '' ? (
+                    <div className="d-flex">
+                      <div>
+                        <Text className="text-base font-normal text-secondary-400">
+                          {t('Customer Name')}
+                        </Text>
+                      </div>
+                      <div> {customerName}</div>
+                    </div>
+                  ) : null}
+                  {customerAddress != '' ? (
+                    <div>
+                      <Text className="text-base font-normal text-secondary-400">
+                        {t('Customer Address')}
+                      </Text>
+                      <div> {customerAddress}</div>
+                    </div>
+                  ) : null}
                 </div>
               </div>
 

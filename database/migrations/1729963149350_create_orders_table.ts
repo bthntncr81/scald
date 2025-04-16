@@ -22,6 +22,10 @@ export default class extends BaseSchema {
       table.boolean('payment_status').defaultTo(false);
       table.json('payment_info').nullable();
       table.text('customer_note').nullable();
+      table.text('customerName').nullable();
+      table.text('customerAddress').nullable();
+      table.text('customerNumber').nullable();
+      table.text('customerMail').nullable();
       table
         .enum('status', [
           'pending',

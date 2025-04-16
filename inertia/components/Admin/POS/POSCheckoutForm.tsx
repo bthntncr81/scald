@@ -1,10 +1,8 @@
 import QuantityController from '@/components/common/QuantityController';
 import usePOS, { POSState } from '@/data/use_pos';
-import useDebounce from '@/hooks/useDebounce';
 import useWindowSize from '@/hooks/useWindowSize';
-import fetcher from '@/lib/fetcher';
 import { PageProps } from '@/types';
-import { Charge, Customer, POSItem, POSItemAddon, POSItemVariant } from '@/types/pos_type';
+import { Charge, POSItem, POSItemAddon, POSItemVariant } from '@/types/pos_type';
 import { convertToCurrencyFormat } from '@/utils/currency_formatter';
 import {
   Badge,
@@ -20,15 +18,9 @@ import {
   HStack,
   IconButton,
   Input,
-  InputGroup,
-  InputLeftElement,
   Popover,
-  PopoverAnchor,
-  PopoverBody,
   PopoverContent,
-  PopoverHeader,
   PopoverTrigger,
-  Spinner,
   Table,
   Tbody,
   Td,
@@ -37,19 +29,16 @@ import {
   Th,
   Thead,
   Tr,
-  useBoolean,
   useDisclosure,
 } from '@chakra-ui/react';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Add, ArrowRight, Edit2, SearchNormal, Trash } from 'iconsax-react';
+import { ArrowRight, Trash } from 'iconsax-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import useSWR, { useSWRConfig } from 'swr';
-import { match, P } from 'ts-pattern';
-import CustomerInsertForm from './CustomerInsertForm';
-import CustomerUpdateForm from './CustomerUpdateForm';
+import { useSWRConfig } from 'swr';
+
 import DiscountTypeRadioGroup from './DiscountTypeSelect';
 import EditPOSItem from './EditPOSItem';
 import OrderTypeRadioGroup from './OrderTypeSelect';
@@ -60,10 +49,10 @@ export const POSCheckoutForm = () => {
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
 
-  const [isCustomerInsertFormOpen, setIsCustomerInsertForm] = useState(false);
-  const [isCustomerUpdateFormOpen, setIsCustomerUpdateForm] = useState(false);
-  const [isCustomerPopoverOpen, setCustomerPopoverOpen] = useBoolean();
-  const [customerSearchText, setCustomerSearchText] = useState('');
+  // const [isCustomerInsertFormOpen, setIsCustomerInsertForm] = useState(false);
+  // const [isCustomerUpdateFormOpen, setIsCustomerUpdateForm] = useState(false);
+  // const [isCustomerPopoverOpen, setCustomerPopoverOpen] = useBoolean();
+  // const [customerSearchText, setCustomerSearchText] = useState('');
   const [discount, setDiscount] = useState<{
     show: boolean;
     value: number;
@@ -73,17 +62,17 @@ export const POSCheckoutForm = () => {
   const [isOrderProcessing, setIsOrderProcessing] = useState(false);
 
   const windowSize = useWindowSize();
-  const customerSearchedText = useDebounce(customerSearchText, 300);
+  // const customerSearchedText = useDebounce(customerSearchText, 300);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const {
     props: { branding },
   } = usePage() as { props: PageProps };
 
-  const { data: users, isLoading: isUserLoading } = useSWR(
-    () => `/api/users?type=customer&search=${customerSearchedText}`,
-    fetcher
-  );
+  // const { data: users, isLoading: isUserLoading } = useSWR(
+  //   () => `/api/users?type=customer&search=${customerSearchedText}`,
+  //   fetcher
+  // );
 
   // reset errors
   const resetError = (key: string) => {
@@ -133,8 +122,6 @@ export const POSCheckoutForm = () => {
       if (!branding?.business?.guestCheckout && !state?.customer?.id) {
         errors.set('customer', 'Customer is required.');
       }
-    } else if (!state?.customer?.id) {
-      errors.set('customer', 'Customer is required.');
     }
 
     // Validate payment type
@@ -161,6 +148,8 @@ export const POSCheckoutForm = () => {
       manualDiscount: state?.discount,
       paymentType: state?.paymentType,
       customerNote: state?.note,
+      customerAddress: state?.customerAddress,
+      customerName: state?.customerName,
       paymentStatus: true,
       deliveryDate: new Date().toISOString().split('T')[0],
       orderItems:
@@ -229,7 +218,7 @@ export const POSCheckoutForm = () => {
           </Flex>
 
           {/* Customer information */}
-          <Flex flexDir="column" gap="2">
+          {/* <Flex flexDir="column" gap="2">
             <label>{t('Customer info')}</label>
             {isCustomerInsertFormOpen ? (
               <CustomerInsertForm
@@ -355,20 +344,30 @@ export const POSCheckoutForm = () => {
             {errors.get('customer') ? (
               <Text className="text-sm text-red-500">{t(errors.get('customer') as 'string')}</Text>
             ) : null}
-          </Flex>
-          {pos?.customer?.address && !(isCustomerUpdateFormOpen || isCustomerInsertFormOpen) ? (
+          </Flex> */}
+          {pos.type === 'delivery' ? (
             <div>
               <HStack gap="0">
-                <Input
-                  readOnly
-                  value={pos?.customer?.address || ''}
-                  placeholder={t('Customer Address')}
-                  onMouseUp={(e) => e.preventDefault()}
-                  onMouseDown={(e) => e.preventDefault()}
-                />
+                <div>
+                  <Input
+                    placeholder={t('Customer Address')}
+                    value={pos.customerAddress}
+                    onChange={(e) => pos.setcustomerAddress(e.target.value)}
+                    className="focus:border-primary-500 focus:outline-none focus:shadow-none mb-2"
+                  />
+                </div>
               </HStack>
             </div>
           ) : null}
+
+          <div>
+            <Input
+              placeholder={t('Customer Name')}
+              value={pos.customerName}
+              onChange={(e) => pos.setcustomerName(e.target.value)}
+              className="focus:border-primary-500 focus:outline-none focus:shadow-none mb-2"
+            />
+          </div>
           <div>
             <Textarea
               rows={3}

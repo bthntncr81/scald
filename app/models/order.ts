@@ -87,6 +87,18 @@ export default class Order extends compose(BaseModel, Filterable) {
   declare customerNote: string | null;
 
   @column()
+  declare customerName: string | null;
+
+  @column()
+  declare customerAddress: string | null;
+
+  @column()
+  declare customerNumber: string | null;
+
+  @column()
+  declare customerMail: string | null;
+
+  @column()
   declare deliveryDate: DateTime | string | null;
 
   @column()

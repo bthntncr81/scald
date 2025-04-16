@@ -11,8 +11,7 @@ export const orderValidator = vine.compile(
           db.from('users').where('id', value).andWhere('role_id', Roles.CUSTOMER).first() || false
         );
       })
-      .optional()
-      .requiredWhen('type', '=', 'pickup'),
+      .optional(),
 
     tableId: vine
       .number()
@@ -25,6 +24,10 @@ export const orderValidator = vine.compile(
     manualDiscount: vine.number().optional(),
     paymentType: vine.enum(['cash', 'card', 'paypal', 'stripe', 'iyzico', 'iyzico_ceppos']),
     customerNote: vine.string().nullable().optional(),
+    customerName: vine.string().nullable().optional(),
+    customerAddress: vine.string().nullable().optional(),
+    customerNumber: vine.string().nullable().optional(),
+    customerMail: vine.string().nullable().optional(),
     deliveryDate: vine.string().trim().optional().requiredWhen('type', '=', 'delivery'),
     orderItems: vine.array(
       vine.object({
@@ -113,8 +116,7 @@ export const orderUpdateValidator = vine.compile(
           db.from('users').where('id', value).andWhere('role_id', Roles.CUSTOMER).first() || false
         );
       })
-      .optional()
-      .requiredWhen('type', '!=', 'dine_in'),
+      .optional(),
     type: vine.enum(['dine_in', 'delivery', 'pickup']),
     manualDiscount: vine.number().optional(),
     paymentType: vine.enum(['cash', 'card', 'paypal', 'stripe', 'iyzico', 'iyzico_ceppos']),
@@ -123,6 +125,10 @@ export const orderUpdateValidator = vine.compile(
       return getStatus(field.parent.type);
     }),
     customerNote: vine.string().nullable().optional(),
+    customerName: vine.string().nullable().optional(),
+    customerAddress: vine.string().nullable().optional(),
+    customerNumber: vine.string().nullable().optional(),
+    customerMail: vine.string().nullable().optional(),
     paymentStatus: vine.boolean().optional(),
   })
 );

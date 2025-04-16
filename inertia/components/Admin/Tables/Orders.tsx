@@ -51,11 +51,13 @@ type Order = {
 type ActiveOrdersDrawerProps = {
   tableId: number;
   isIconButton?: boolean;
+  refresh: () => void;
 };
 
 export default function ActiveOrdersDrawer({
   tableId,
   isIconButton = true,
+  refresh,
 }: ActiveOrdersDrawerProps) {
   const { t } = useTranslation();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -82,6 +84,7 @@ export default function ActiveOrdersDrawer({
       .post('/api/orders/updatePaymentStatus', { orderIds, paymentType })
       .then(() => {
         toast.success(t('Orders updated successfully'));
+        refresh();
         onClose();
       })
       .catch(() => toast.error(t('Failed to update orders')));

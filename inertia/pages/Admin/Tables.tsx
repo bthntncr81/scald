@@ -11,11 +11,14 @@ import DeleteTable from '@/components/Admin/Tables/DeleteTable';
 import EditTable from '@/components/Admin/Tables/EditTable';
 import NewTable from '@/components/Admin/Tables/NewTable';
 import ActiveOrdersDrawer from '@/components/Admin/Tables/Orders';
+import { convertToCurrencyFormat } from '@/utils/currency_formatter';
+import { IconButton } from '@chakra-ui/react';
+import { Add, ElementPlus } from 'iconsax-react';
 
 export default function Tables() {
   const { t } = useTranslation();
   const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(10);
+  const [limit, setLimit] = useState<number>(500);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const searchedText = useDebounce(searchQuery, 300);
   const [selectedRows, setSelectedRows] = useState<Record<string, any>[]>([]);
@@ -118,14 +121,25 @@ export default function Tables() {
                 onClick={() => handleTableClick(table.id, table.number, table.tableAreaName)} // Navigate on click
                 className="flex justify-between items-center"
               >
-                <h3 className="text-lg font-semibold">
-                  {t('Table')} #{table.number}
-                </h3>
-                <span className="text-sm text-gray-500">{table.tableAreaName}</span>
+                <span className="text-lg ">{table.tableAreaName}</span>
+
+                <h3 className="text-lg font-semibold">#{table.number}</h3>
+
+                <IconButton
+                  onClick={() => handleTableClick(table.id, table.number, table.tableAreaName)}
+                  aria-label="Delete"
+                  icon={<Add size="18" />}
+                  colorScheme="green"
+                  className="hover:bg-red-100"
+                  variant="outline"
+                />
+              </div>
+              <div className="text-center mt-4" style={{ fontSize: 24 }}>
+                {t('Total')} :&nbsp;{convertToCurrencyFormat(table.totalPrice)}
               </div>
               <div className="mt-4 flex justify-between items-center">
                 <DeleteTable id={table.id} refresh={refresh} />
-                <ActiveOrdersDrawer tableId={table.id} />
+                <ActiveOrdersDrawer tableId={table.id} refresh={refresh} />
                 <EditTable table={table} refresh={refresh} />
               </div>
             </div>
@@ -133,7 +147,7 @@ export default function Tables() {
         </div>
 
         {/* Pagination */}
-        {meta && (
+        {/* {meta && (
           <div className="mt-6 flex justify-between">
             <button
               onClick={() => setPage((prevPage) => Math.max(prevPage - 1, 1))}
@@ -150,7 +164,7 @@ export default function Tables() {
               {t('Next')}
             </button>
           </div>
-        )}
+        )} */}
       </div>
     </Layout>
   );

@@ -7,12 +7,17 @@ router
     router.get('/', [OrdersController, 'index']);
     router.get('/:id', [OrdersController, 'getById']);
     router.get('/:id/generate-invoice', [OrdersController, 'generateInvoice']);
-    router.post('/', [OrdersController, 'store']);
     router.post('/calculate', [OrdersController, 'calculate']);
   })
   .prefix('/api/user/orders')
   .use(middleware.auth({ guards: ['web'] }))
   .use(middleware.role({ guards: ['customer'] }));
+
+router
+  .group(() => {
+    router.post('/', [OrdersController, 'store']);
+  })
+  .prefix('/api/user/orders');
 
 router
   .get('/api/orders/', [OrdersController, 'adminIndex'])

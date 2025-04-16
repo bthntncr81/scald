@@ -115,7 +115,7 @@ export const TablePOSCheckoutForm = ({
   const onPlaceOrder = async (state: POSState) => {
     const errors = new Map<string, string>();
     setIsOrderProcessing(true);
-
+    state.type = 'dine_in';
     // Validate order type
     if (!state.type) {
       errors.set('orderType', 'Order type is required.');
@@ -147,10 +147,10 @@ export const TablePOSCheckoutForm = ({
     // Format the data for submission
     const formattedData = {
       tableId: selectedTableId,
-      type: state.type,
       manualDiscount: state.discount,
       paymentType: state.paymentType,
       customerNote: state.note,
+      type: 'dine_in',
       paymentStatus: true,
       orderItems: state.POSItems.map((item) => ({
         menuItemId: item.id,

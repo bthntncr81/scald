@@ -10,9 +10,14 @@ export interface POSState {
   discount: number;
   total: number;
   note: string;
+  customerName: string;
+  customerAddress: string;
   POSItems: POSItem[];
   POSCharges: Charge[];
   setNote: (note: string) => void;
+  setcustomerName: (customerName: string) => void;
+  setcustomerAddress: (customerAddress: string) => void;
+
   changeType: (type: 'delivery' | 'dine_in' | 'pickup', deliveryCharge: number) => void;
   addItemToPOS: (item: POSItem) => void;
   selectAddon: (
@@ -59,9 +64,13 @@ const usePOS = create<POSState>()(
       discount: 0,
       total: 0,
       note: '',
+      customerName: '',
+      customerAddress: '',
       POSItems: [],
       POSCharges: [],
       setNote: (note: string) => set({ note }),
+      setcustomerName: (customerName: string) => set({ customerName }),
+      setcustomerAddress: (customerAddress: string) => set({ customerAddress }),
       changeType: (type: 'delivery' | 'dine_in' | 'pickup', deliveryCharge: number) => {
         if (type === 'delivery') {
           set((state) => ({
@@ -272,8 +281,10 @@ const usePOS = create<POSState>()(
           discount: 0,
           total: 0,
           note: '',
+          customerAddress: '',
+          customerName: '',
           customer: null,
-          type: 'dine_in',
+          type: 'pickup',
           paymentType: 'cash',
         }),
     }),

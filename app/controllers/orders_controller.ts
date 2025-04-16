@@ -338,12 +338,12 @@ export default class OrdersController {
   async store({ logger, request, response, auth }: HttpContext) {
     try {
       const payload = await request.validateUsing(orderValidator);
-      if (auth.user!.roleId === Roles.CUSTOMER && auth.user!.id !== payload.userId) {
-        return response.badRequest({
-          success: false,
-          message: 'You have no permission to create this order',
-        });
-      }
+      // if (auth.user!.roleId === Roles.CUSTOMER && auth.user!.id !== payload.userId) {
+      //   return response.badRequest({
+      //     success: false,
+      //     message: 'You have no permission to create this order',
+      //   });
+      // }
 
       const { orderItems, deliveryDate, ...restPayload } = payload;
       const businessSetup = await BusinessSetup.firstOrFail();
@@ -393,8 +393,7 @@ export default class OrdersController {
       await order.related('orderCharges').createMany(chargesData);
 
       const data = await this.fetchOrderWithRelations(order.id);
-
-      if (auth.user!.roleId === Roles.CUSTOMER && !['cash', 'card'].includes(payload.paymentType)) {
+      if (!['cash', 'card'].includes(payload.paymentType)) {
         const methodConfig = await PaymentMethod.query()
           .where('key', payload.paymentType)
           .andWhere('status', true)
@@ -452,7 +451,7 @@ export default class OrdersController {
           var dbName = process.env.DB_DATABASE || 'default_db'; // Eğer yoksa varsayılan değer kullan,
           return response.json({
             success: true,
-            redirectUrl: `https://pay.posfix.shop?orderId=${order.id}&db_id=${dbName})}`, // DB adını URL'ye ekledik
+            redirectUrl: `https://pay.posfix.shop?orderId=${order.id}&db_id=${dbName}`, // DB adını URL'ye ekledik
           });
         }
 

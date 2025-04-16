@@ -73,7 +73,6 @@ export default function OrderTypeRadioGroup({
     : [
         { label: 'Pick-up', value: 'pickup', disabled: !branding?.business?.dineIn },
         { label: 'Delivery', value: 'delivery', disabled: !branding?.business?.delivery },
-        { label: 'Dine-in', value: 'dine_in', disabled: !branding?.business?.pickup },
       ];
 
   // Find the first non-disabled option

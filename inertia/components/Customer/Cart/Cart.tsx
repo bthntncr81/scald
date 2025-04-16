@@ -300,7 +300,7 @@ export default function Cart() {
               </Button>
               <Button
                 as={Link}
-                href={auth?.id ? '/user/checkout' : '/login'}
+                href={'/user/checkout'}
                 variant="solid"
                 colorScheme="primary"
                 disabled={cart.POSItems.length === 0}

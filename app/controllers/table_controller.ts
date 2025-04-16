@@ -3,49 +3,60 @@ import Table from '#models/table'; // Make sure the path is correct
 import errorHandler from '#exceptions/error_handler';
 import { tableValidator } from '#validators/table';
 import Order from '#models/order';
-
 export default class TablesController {
   // List all tables with pagination
   async index({ logger, request, response }: HttpContext) {
     try {
-      const { page, limit } = request.qs();
+      const { page, limit, search } = request.qs();
 
-      // tables ve table_areas tablolarını birleştiriyoruz
-      const dataQuery = Table.query()
+      // Tüm masaları al, ayrı bir sorguda ödeme yapılmamış siparişlerin toplam tutarını toplayacağız
+      const baseQuery = Table.query()
         .select(
           'tables.id',
           'tables.table_area_id',
           'tables.number',
           'tables.created_at',
           'tables.updated_at',
-          'table_areas.name as table_area_name' // table_area_name olarak alıyoruz
+          'table_areas.name as table_area_name'
         )
-        .join('table_areas', 'tables.table_area_id', 'table_areas.id') // doğru şekilde ilişkilendiriyoruz
+        .join('table_areas', 'tables.table_area_id', 'table_areas.id')
         .orderBy('tables.created_at', 'desc');
 
-      // Sayfalama işlemini uygulayalım
-      const data =
-        page && limit
-          ? await dataQuery.paginate(page, limit) // Sayfalama varsa kullan
-          : await dataQuery.exec(); // Sayfalama yoksa tüm veriyi al
-      // Veriyi formatlayarak sadece table verisini döndürelim
+      if (search) {
+        baseQuery.whereRaw(`CONCAT(tables.number, ' ', table_areas.name) LIKE ?`, [`%${search}%`]);
+      }
 
-      var formattedData: any = {
+      const allTables =
+        page && limit ? await baseQuery.paginate(page, limit) : await baseQuery.exec();
+
+      // Her bir masaya ait ödeme yapılmamış siparişlerin toplam tutarını topla
+      const unpaidTotals = await Order.query()
+        .where('payment_status', false)
+        .select('table_id')
+        .sum('grand_total as total')
+        .groupBy('table_id');
+
+      const totalMap = Object.fromEntries(
+        unpaidTotals.map((item: any) => {
+          return [item.$attributes.tableId, Number(item.$attributes.total)];
+        })
+      );
+
+      const formattedData: any = {
         data: [],
       };
-      data.forEach((item: any) => {
-        var obj = {
-          id: item.$attributes.id,
-          tableAreaId: item.$attributes.tableAreaId,
-          number: item.$attributes.number,
-          createdAt: item.$attributes.createdAt,
-          updatedAt: item.$attributes.updatedAt,
-          tableAreaName: item.$extras.table_area_name, // Burada $extras içindeki table_area_name'i alıyoruz
-        };
-        formattedData.data.push(obj);
+      allTables.forEach((item: any) => {
+        formattedData.data.push({
+          id: item.id,
+          tableAreaId: item.tableAreaId,
+          number: item.number,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+          tableAreaName: item.$extras.table_area_name,
+          totalPrice: totalMap[item.id] || 0,
+        });
       });
 
-      // Yeni formatta sadece veriyi döndürelim
       return response.json(formattedData);
     } catch (error) {
       errorHandler(error, response, logger, 'Index Tables Error');
