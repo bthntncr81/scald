@@ -69,7 +69,9 @@ export default function POSItem({
 
   // menu price
   const menuPrice = calculateDiscountedPrice(price, props.discount, props.discountType);
+  const showedPrice = price * ((100 + props.charges[0].amount) / 100);
 
+  console.log(showedPrice);
   useEffect(() => {
     // calculate total price
     let totalPrice = menuPrice;
@@ -122,7 +124,7 @@ export default function POSItem({
         onOpen={onOpen}
         name={name}
         description={description}
-        price={price}
+        price={showedPrice}
         image={image?.url ?? ''}
         discount={Number(props?.discount ?? 0)}
         discountType={props?.discountType ?? ''}

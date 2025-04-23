@@ -2,6 +2,7 @@ import fetcher from '@/lib/fetcher';
 import {
   Box,
   Button,
+  Checkbox,
   Flex,
   HStack,
   IconButton,
@@ -24,38 +25,51 @@ import { useTranslation } from 'react-i18next';
 interface Option extends Record<string, any> {
   name: string;
   id: string;
+  rate?: string;
+}
+
+interface MenuItemTaxAndChargesProps {
+  defaultValue?: Option[];
+  onSelect: (values: Option[]) => void;
+  onTaxIncludedChange?: (included: boolean) => void;
+  onTaxRateChange?: (rate: number) => void;
 }
 
 export const MenuItemTaxAndCharges = ({
   defaultValue = [],
   onSelect,
-}: {
-  defaultValue?: Option[];
-  onSelect: (values: Option[]) => void;
-}) => {
+  onTaxIncludedChange,
+  onTaxRateChange,
+}: MenuItemTaxAndChargesProps) => {
   const { t } = useTranslation();
   const { data, isLoading } = useSWR('/api/charges', fetcher);
   const [selected, setSelected] = useState<Option[]>([]);
   const [isOpen, setIsOpen] = useBoolean();
+  const [isTaxIncluded, setIsTaxIncluded] = useState(false);
 
-  // initialize default selected options
   useEffect(() => {
     if (!isLoading && !selected.length && data?.length && defaultValue) {
       const filterData = data.filter((option: any) => defaultValue.includes(option.id));
       setSelected(filterData);
+      if (filterData.length === 1) {
+        const rate = parseFloat(filterData[0].amount || '0');
+        onTaxRateChange?.(rate);
+      }
     }
   }, [isLoading, defaultValue, data]);
 
-  // remove a selected option from selected state
+  useEffect(() => {
+    onTaxIncludedChange?.(isTaxIncluded);
+  }, [isTaxIncluded, onTaxIncludedChange]);
+
   const removeItem = (item: Option) => {
     const newSelection = selected.filter((o: Option) => o.id !== item.id);
     setSelected(newSelection);
     onSelect(newSelection);
   };
 
-  // handle on select functionality
   const handleOnSelect = (option: Option) => {
-    const index = selected.indexOf(option);
+    const index = selected.findIndex((o) => o.id === option.id);
     let selectedData: Option[];
 
     if (index === -1) {
@@ -67,10 +81,23 @@ export const MenuItemTaxAndCharges = ({
     setSelected(selectedData);
     onSelect(selectedData);
     setIsOpen.off();
+
+    if (selectedData.length === 1) {
+      const rate = parseFloat(selectedData[0].amount || '0');
+      onTaxRateChange?.(rate);
+    }
   };
 
   return (
     <Flex direction="column" gap={4}>
+      <Checkbox
+        isChecked={isTaxIncluded}
+        onChange={(e) => setIsTaxIncluded(e.target.checked)}
+        colorScheme="green"
+      >
+        {t('Is tax included in price?')}
+      </Checkbox>
+
       <Popover isOpen={isOpen} onOpen={setIsOpen.on} onClose={setIsOpen.off} matchWidth>
         <PopoverTrigger>
           <Flex>

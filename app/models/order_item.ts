@@ -21,6 +21,9 @@ export default class OrderItem extends compose(BaseModel, Filterable) {
   declare name: string;
 
   @column()
+  declare paidQuantity: number;
+
+  @column()
   declare description: string;
 
   @column({

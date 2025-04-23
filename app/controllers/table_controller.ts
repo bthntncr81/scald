@@ -14,6 +14,7 @@ export default class TablesController {
         .select(
           'tables.id',
           'tables.table_area_id',
+          'tables.active_table_name',
           'tables.number',
           'tables.created_at',
           'tables.updated_at',
@@ -29,18 +30,26 @@ export default class TablesController {
       const allTables =
         page && limit ? await baseQuery.paginate(page, limit) : await baseQuery.exec();
 
-      // Her bir masaya ait ödeme yapılmamış siparişlerin toplam tutarını topla
-      const unpaidTotals = await Order.query()
+      // Her bir masaya ait ödeme yapılmamış siparişlerin toplam tutarını, ödenmemiş miktar üzerinden topla
+      const unpaidOrders = await Order.query()
         .where('payment_status', false)
-        .select('table_id')
-        .sum('grand_total as total')
-        .groupBy('table_id');
+        .preload('orderItems', (query) => {
+          query.select('id', 'order_id', 'quantity', 'paid_quantity', 'total_price');
+        });
 
-      const totalMap = Object.fromEntries(
-        unpaidTotals.map((item: any) => {
-          return [item.$attributes.tableId, Number(item.$attributes.total)];
-        })
-      );
+      const totalMap: Record<number, number> = {};
+
+      for (const order of unpaidOrders) {
+        const unpaidAmount = order.orderItems.reduce((sum, item) => {
+          const qty = item.quantity ?? 0;
+          const paid = item.paidQuantity ?? 0;
+          const unitPrice = item.totalPrice ?? 0;
+          const unpaidQty = Math.max(qty - paid);
+          return sum + unitPrice * unpaidQty;
+        }, 0);
+
+        totalMap[order.tableId!] = (totalMap[order.tableId!] || 0) + unpaidAmount;
+      }
 
       const formattedData: any = {
         data: [],

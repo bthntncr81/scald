@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function LangSwitcher({ isCustomer = false }: { isCustomer?: boolean }) {
   const [lang, setLang] = useState(
-    JSON.parse(localStorage.getItem('lang') || '{"name": "English", "code": "en"}')
+    JSON.parse(localStorage.getItem('lang') || '{"name": "Turkish", "code": "tr"}')
   );
   const { branding }: any = usePage().props;
   const { i18n } = useTranslation();

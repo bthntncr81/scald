@@ -12,9 +12,14 @@ import {
   RadioGroup,
   Stack,
   useDisclosure,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverArrow,
+  PopoverBody,
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
-import { Eye } from 'iconsax-react';
+import { Eye, Trash } from 'iconsax-react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -65,12 +70,56 @@ export default function ActiveOrdersDrawer({
   const btnRef = useRef<HTMLButtonElement>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [paymentType, setPaymentType] = useState<'cash' | 'card'>('cash'); // Set default to 'cash'
+  const [expandedItems, setExpandedItems] = useState<
+    {
+      id: string;
+      name: string;
+      price: number;
+      checked: boolean;
+      itemId: number;
+      quantity: number;
+    }[]
+  >([]);
 
   useEffect(() => {
     if (isOpen) {
       axios
         .get(`/api/tables/getOrdersByTableId/${tableId}`)
-        .then((res) => setOrders(res.data || []))
+        .then((res) => {
+          const rawOrders = res.data || [];
+          setOrders(rawOrders);
+          const expanded: {
+            id: string;
+            name: string;
+            price: number;
+            checked: boolean;
+            itemId: number;
+            quantity: number;
+          }[] = [];
+          rawOrders.forEach((order: any) => {
+            order.orderItems.forEach((item: any) => {
+              const paidQty = item.paidQuantity ?? 0;
+              const quantity = item.quantity ?? 0;
+
+              // Tüm ödemesi tamamlanan ürünleri listeleme
+              if (paidQty >= quantity) return;
+
+              const unitPrice = item.totalPrice;
+
+              for (let i = 0; i < quantity - paidQty; i++) {
+                expanded.push({
+                  id: `${order.id}_${item.id}_${i}`,
+                  name: item.name,
+                  price: unitPrice,
+                  checked: i < paidQty, // Ödenmişse otomatik seçili
+                  itemId: item.id,
+                  quantity: quantity,
+                });
+              }
+            });
+          });
+          setExpandedItems(expanded);
+        })
         .catch(() => toast.error(t('Failed to load orders')));
     }
   }, [isOpen, tableId]);
@@ -88,6 +137,33 @@ export default function ActiveOrdersDrawer({
         onClose();
       })
       .catch(() => toast.error(t('Failed to update orders')));
+  };
+
+  const paidTotal = expandedItems.reduce((sum, item) => (item.checked ? sum + item.price : sum), 0);
+
+  // Handle Partial Payment for Selected Items
+  const handlePartialPayment = () => {
+    const itemMap: Record<string, { orderItemId: number; paidQuantity: number }> = {};
+
+    expandedItems.forEach((item) => {
+      const [orderId, itemId] = item.id.split('_').map(Number);
+      if (!itemMap[itemId]) {
+        itemMap[itemId] = { orderItemId: itemId, paidQuantity: 0 };
+      }
+      if (item.checked) {
+        itemMap[itemId].paidQuantity += 1;
+      }
+    });
+
+    const updates = Object.values(itemMap);
+    axios
+      .post('/api/orders/updateOrderItemsPaidQuantity', { updates })
+      .then(() => {
+        toast.success(t('Selected items marked as paid.'));
+        refresh();
+        onClose();
+      })
+      .catch(() => toast.error(t('Failed to update paid quantities')));
   };
 
   return (
@@ -178,6 +254,85 @@ export default function ActiveOrdersDrawer({
                 </div>
               ))
             )}
+
+            <div className="border-t pt-4 mt-4">
+              <div className="font-semibold mb-2">{t('Unpaid Items')}</div>
+              <div className="flex flex-wrap gap-2">
+                {expandedItems.map((item, index) => (
+                  <div key={item.id} className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        const updated = [...expandedItems];
+                        const idx = updated.findIndex((x) => x.id === item.id);
+                        updated[idx].checked = !updated[idx].checked;
+                        setExpandedItems(updated);
+                      }}
+                      className={`px-3 py-1 rounded-md border text-sm font-medium ${
+                        item.checked
+                          ? 'bg-green-500 text-white border-green-600'
+                          : 'bg-white text-gray-800 border-gray-300'
+                      }`}
+                    >
+                      {item.name} – {item.price.toFixed(2)} ₺
+                    </button>
+                    <Popover>
+                      <PopoverTrigger>
+                        <IconButton
+                          icon={<Trash size="16" />}
+                          aria-label="Delete"
+                          size="sm"
+                          variant="ghost"
+                          colorScheme="red"
+                        />
+                      </PopoverTrigger>
+                      <PopoverContent width="fit-content">
+                        <PopoverArrow />
+                        <PopoverBody>
+                          <p className="text-sm mb-2">{t('Are you sure to remove this item?')}</p>
+                          <Button
+                            colorScheme="red"
+                            size="sm"
+                            onClick={() => {
+                              const updated = [...expandedItems];
+                              const occurrences = updated.filter(
+                                (x) => x.itemId === item.itemId
+                              ).length;
+
+                              if (occurrences <= 1) {
+                                axios
+                                  .delete(`/api/orders/deleteOrderItem/${item.itemId}`)
+                                  .then(() => {
+                                    setExpandedItems(
+                                      updated.filter((x) => x.itemId !== item.itemId)
+                                    );
+                                    toast.success(t('Item deleted'));
+                                    refresh();
+                                  })
+                                  .catch(() => toast.error(t('Failed to delete item')));
+                              } else {
+                                // Remove only one instance visually
+                                const indexToRemove = updated.findIndex((x) => x.id === item.id);
+                                updated.splice(indexToRemove, 1);
+                                setExpandedItems(updated);
+                                // Send PATCH to reduce quantity
+                                axios
+                                  .patch(`/api/orders/reduceOrderItemQuantity`, {
+                                    itemId: item.itemId,
+                                  })
+                                  .then(() => toast.success(t('Item quantity reduced')))
+                                  .catch(() => toast.error(t('Failed to reduce quantity')));
+                              }
+                            }}
+                          >
+                            {t('Confirm')}
+                          </Button>
+                        </PopoverBody>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                ))}
+              </div>
+            </div>
           </DrawerBody>
 
           <DrawerFooter className="bg-white w-full border-t border-black/5 flex flex-col items-start space-y-4 py-4">
@@ -192,13 +347,20 @@ export default function ActiveOrdersDrawer({
                 </Stack>
               </RadioGroup>
             </div>
+            {/* Partial Pay Button: show if at least one item is selected and not all are checked */}
+            {expandedItems.some((item) => item.checked) &&
+              expandedItems.some((item) => !item.checked) && (
+                <Button colorScheme="blue" onClick={handlePartialPayment} className="w-full">
+                  {t('Pay Selected Items')}
+                </Button>
+              )}
             <Button colorScheme="green" onClick={handleCloseOrder} className="w-full">
               {t('Close Order')}
             </Button>
 
             <div className="w-full flex justify-between font-bold text-lg">
               <span>{t('Grand Total')}</span>
-              <span>{getGrandTotal().toFixed(2)} ₺</span>
+              <span>{paidTotal.toFixed(2)} ₺</span>
             </div>
           </DrawerFooter>
         </DrawerContent>

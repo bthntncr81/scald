@@ -788,4 +788,83 @@ export default class OrdersController {
       .where('id', orderId)
       .firstOrFail();
   }
+
+  async updateOrderItemsPaidQuantity({ request, response, logger }: HttpContext) {
+    try {
+      const { updates } = request.only(['updates']);
+
+      if (!Array.isArray(updates)) {
+        return response.badRequest({ message: 'Invalid updates format' });
+      }
+
+      for (const update of updates) {
+        const { orderItemId, paidQuantity } = update;
+        const orderItem = await OrderItem.find(orderItemId);
+        if (orderItem) {
+          orderItem.paidQuantity = paidQuantity;
+          await orderItem.save();
+        }
+      }
+
+      return response.ok({ message: 'Order item paid quantities updated successfully' });
+    } catch (error) {
+      logger.error('Failed to update order item paid quantities', error);
+      return response.status(500).json({
+        message: 'An error occurred while updating paid quantities',
+        error: error.message,
+      });
+    }
+  }
+  async deleteOrderItem({ params, response, logger }: HttpContext) {
+    try {
+      const item = await OrderItem.findOrFail(params.id);
+      const orderId = item.orderId;
+      await item.delete();
+
+      // Check if order still has items
+      const remainingItems = await OrderItem.query().where('order_id', orderId);
+      if (remainingItems.length === 0) {
+        const order = await Order.find(orderId);
+        if (order) {
+          await order.delete();
+        }
+      }
+
+      return response.ok({ message: 'Item deleted successfully' });
+    } catch (error) {
+      logger.error('Delete order item failed', error);
+      return response.status(500).json({ message: 'Failed to delete item' });
+    }
+  }
+
+  async reduceOrderItemQuantity({ request, response, logger }: HttpContext) {
+    try {
+      const { itemId } = request.only(['itemId']);
+      const item = await OrderItem.findOrFail(itemId);
+      if (item.quantity > 1) {
+        item.quantity -= 1;
+        item.totalPrice = item.totalPrice * (item.quantity / (item.quantity + 1));
+        await item.save();
+        return response.ok({ message: 'Quantity reduced' });
+      } else {
+        return response.badRequest({ message: 'Quantity is already minimum' });
+      }
+    } catch (error) {
+      logger.error('Failed to reduce quantity', error);
+      return response.status(500).json({ message: 'Failed to reduce quantity' });
+    }
+  }
+  async moveOrdersToAnotherTable({ request, response, logger }: HttpContext) {
+    try {
+      const { fromTableId, toTableId } = request.only(['fromTableId', 'toTableId']);
+      await Order.query()
+        .where('table_id', fromTableId)
+        .andWhere('paymentStatus', false)
+        .update({ tableId: toTableId });
+      return response.ok({ success: true, message: 'Orders moved successfully.' });
+    } catch (error) {
+      logger.error('Move Orders Error', error);
+      return response.status(500).json({ message: 'Failed to move orders', error: error.message });
+    }
+  }
 }

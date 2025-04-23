@@ -1,3 +1,4 @@
+// MenuItemFormFieldRenderer.tsx
 import {
   FormControl,
   FormLabel,
@@ -24,6 +25,10 @@ export default function MenuItemFormFieldRenderer({
   type = 'text',
   previewImage = '',
   options,
+  isTaxIncluded,
+  taxRate,
+  onTaxIncludedChange,
+  onTaxRateChange,
   ...props
 }: {
   label?: string;
@@ -32,9 +37,14 @@ export default function MenuItemFormFieldRenderer({
   type?: string;
   options?: Record<'label' | 'value', string>[];
   previewImage?: string;
+  isTaxIncluded?: boolean;
+  taxRate?: number;
+  onTaxIncludedChange?: (val: boolean) => void;
+  onTaxRateChange?: (val: number) => void;
 }) {
   const { t } = useTranslation();
   const [field, meta, helpers] = useField(props);
+
   return (
     <FormControl className="flex flex-col" isInvalid={!!(meta.touched && meta.error)}>
       {label && (
@@ -44,58 +54,35 @@ export default function MenuItemFormFieldRenderer({
       )}
 
       {match(type)
-        // handle category input
         .with('combobox-category', () => (
           <MenuItemCategorySelection
             defaultValue={field.value}
-            onChange={(category) => {
-              helpers.setValue(category.id);
-            }}
+            onChange={(category) => helpers.setValue(category.id)}
             placeholder={t('Search or select')}
           />
         ))
-
-        // handle addons input
         .with('tag-addons', () => (
           <MenuItemAddonsSelection
             defaultValue={field.value ?? []}
-            onSelect={(values) => {
-              const ids = values.map((v) => v.id);
-              helpers.setValue(ids);
-            }}
+            onSelect={(values) => helpers.setValue(values.map((v) => v.id))}
           />
         ))
-
-        // handle variant input
         .with('tag-variants', () => (
           <MenuItemVariantSelection
             defaultValues={field.value}
-            onSelect={(values: any) => {
-              const ids = values?.map((v: any) => v.value) ?? [];
-              helpers.setValue(ids);
-            }}
+            onSelect={(values: any) => helpers.setValue(values?.map((v: any) => v.value) ?? [])}
           />
         ))
-
-        // handle charges input
         .with('tag-charges', () => (
           <MenuItemTaxAndCharges
             defaultValue={field.value}
-            onSelect={(values: any) => {
-              const ids = values?.map((v: any) => v.id) ?? [];
-              helpers.setValue(ids);
-            }}
+            onSelect={(values: any) => helpers.setValue(values?.map((v: any) => v.id) ?? [])}
+            onTaxIncludedChange={onTaxIncludedChange}
+            onTaxRateChange={onTaxRateChange}
           />
         ))
-
-        // handle radio group types
         .with('radio-group', () => (
-          <RadioGroup
-            value={field.value}
-            onChange={(value) => {
-              helpers.setValue(value);
-            }}
-          >
+          <RadioGroup value={field.value} onChange={(value) => helpers.setValue(value)}>
             <Stack direction="row" gap={4} className="text-sm font-normal leading-5">
               {options?.map((option) => (
                 <Radio
@@ -110,22 +97,17 @@ export default function MenuItemFormFieldRenderer({
             </Stack>
           </RadioGroup>
         ))
-
-        // file upload
         .with('file', () => (
           <Flex flexDir="column">
             <MenuItemImageUpload
               defaultValue={field.value ? URL.createObjectURL(field.value) : previewImage}
               onChange={(file) => helpers.setValue(file)}
             />
-
             <Text color="secondary.400" mt={4} fontSize={14} lineHeight={5}>
               {t('Max file size is 500kb. Supported file types are .jpg and .png.')}
             </Text>
           </Flex>
         ))
-
-        // handle unmatched types
         .otherwise(() => {
           const Comp = type === 'textarea' ? Textarea : Input;
           return (
@@ -133,12 +115,22 @@ export default function MenuItemFormFieldRenderer({
               className="focus:shadow-none focus:border-primary-500"
               type={type}
               {...(type === 'number' && { min: 0 })}
-              {...field}
+              value={field.value}
+              onChange={(e) => {
+                let value = e.target.value;
+                if (type === 'number') {
+                  let num = parseFloat(value);
+                  helpers.setValue(Number.isNaN(num) ? '' : parseFloat(num.toFixed(2)));
+                } else {
+                  helpers.setValue(value);
+                }
+              }}
               {...props}
               placeholder={t(props.placeholder || '')}
             />
           );
         })}
+
       <FormErrorMessage>{t(meta.error || '')}</FormErrorMessage>
     </FormControl>
   );

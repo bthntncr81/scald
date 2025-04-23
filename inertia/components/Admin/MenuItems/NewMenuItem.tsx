@@ -1,3 +1,4 @@
+// NewMenuItem.tsx
 import useWindowSize from '@/hooks/useWindowSize';
 import NewMenuItemSchema from '@/schemas/NewMenuItemSchema';
 import {
@@ -22,7 +23,6 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import MenuItemFormFieldRenderer from './MenuItemFormFieldRenderer';
 
-// initial steps
 const initSteps = [
   { id: 'information', title: 'Basic information and pricing', isComplete: false },
   { id: 'add-ons', title: 'Variation and add-ons', isComplete: false },
@@ -35,6 +35,8 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
   const [activeTab, setActiveTab] = useState<'information' | 'add-ons'>('information');
   const [steps, setSteps] = useState(initSteps);
   const windowSize = useWindowSize();
+  const [isTaxIncluded, setIsTaxIncluded] = useState(false);
+  const [taxRate, setTaxRate] = useState(0);
 
   const fieldItems = [
     {
@@ -42,11 +44,7 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
       fields: [
         { name: 'name', type: 'text', placeholder: 'Item name' },
         { name: 'description', type: 'textarea', placeholder: 'Item description' },
-        {
-          name: 'image',
-          label: 'Item image',
-          type: 'file',
-        },
+        { name: 'image', label: 'Item image', type: 'file' },
         { name: 'categoryId', label: 'Category', type: 'combobox-category' },
         {
           name: 'foodType',
@@ -84,16 +82,20 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
     },
   ];
 
-  // handle form submit
   const handleOnSubmit = async (values: any, actions: any) => {
     try {
+      debugger;
       actions.setSubmitting(true);
 
-      const formData = new FormData();
+      if (values.price && values.chargeIds?.length === 1 && isTaxIncluded && taxRate > 0) {
+        const grossPrice = parseFloat(values.price);
+        values.price = (grossPrice / (1 + taxRate / 100)).toFixed(2);
+      }
 
+      const formData = new FormData();
       for (const key in values) {
         if (Array.isArray(values[key])) {
-          if (values[key].length == 0) {
+          if (values[key].length === 0) {
             formData.append(`${key}[]`, '');
           }
           values[key].forEach((item) => formData.append(`${key}[]`, item ?? ''));
@@ -106,7 +108,6 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      // Handle success
       if (data?.content?.id) {
         refresh?.();
         toast.success(t('Menu item created successfully'));
@@ -115,13 +116,12 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
         setSteps(initSteps);
       }
     } catch (e) {
-      toast.error(t(e.response.data.message) || t('Something went wrong'));
+      toast.error(t(e.response?.data?.message || 'Something went wrong'));
     } finally {
       actions.setSubmitting(false);
     }
   };
 
-  // format initial values
   const initialValues = {
     name: '',
     description: '',
@@ -146,15 +146,11 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
           color="white"
           bg="primary.400"
           gap="2"
-          alignItems="center"
           rounded="6px"
           px={4}
-          colorScheme="primary"
           onClick={onOpen}
-          className="hover:bg-primary-500"
         >
-          {t('Create new item')}
-          <Add size={14} />
+          {t('Create new item')} <Add size={14} />
         </Button>
       </Box>
 
@@ -170,7 +166,7 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
         finalFocusRef={btnRef}
       >
         <DrawerOverlay />
-        <DrawerContent className="@container h-[80%] sm:h-auto rounded-t-xl sm:rounded-t-none">
+        <DrawerContent className="@container h-[80%] sm:h-auto rounded-t-xl sm:rounded-none">
           <DrawerHeader className="border-b border-black/5 hidden @md:flex">
             <HStack gap={0} className="w-full">
               {steps.map((step) => (
@@ -179,23 +175,10 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
                   data-complete={step.isComplete}
                   key={step.id}
                   w="full"
-                  px={2}
-                  py={2}
-                  borderTop="2px"
-                  rounded={0}
-                  fontSize={14}
-                  fontWeight={400}
-                  lineHeight={5}
-                  className="flex-1 justify-start bg-transparent gap-2 hover:bg-transparent cursor-default hover:cursor-default data-[selected=true]:border-primary-400 data-[selected=true]:text-primary-400 border-secondary-300 data-[complete=true]:text-primary-400 data-[complete=true]:border-primary-400 text-center"
+                  className="bg-transparent border-t-2 text-sm data-[selected=true]:border-primary-400"
                 >
-                  {step.isComplete ? (
-                    <TickCircle variant="Bold" size={16} />
-                  ) : (
-                    <MoreCircle size={16} />
-                  )}
-                  <Text whiteSpace="nowrap" color="black">
-                    {t(step.title)}
-                  </Text>
+                  {step.isComplete ? <TickCircle size={16} /> : <MoreCircle size={16} />}
+                  <Text>{t(step.title)}</Text>
                 </Button>
               ))}
             </HStack>
@@ -203,80 +186,56 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
 
           <Formik
             initialValues={initialValues}
-            onSubmit={handleOnSubmit}
             validationSchema={NewMenuItemSchema}
+            onSubmit={handleOnSubmit}
           >
             {({ isSubmitting, submitForm, errors }) => (
-              <Form className="flex flex-col flex-1 overflow-y-auto">
-                <DrawerBody className="space-y-4 p-0 h-[calc(100vh-80px)] @md:h-[calc(100vh-150px)] overflow-y-auto">
-                  <div className="flex flex-col">
-                    {activeTab === 'information' &&
-                      fieldItems.map((group) => (
-                        <Box
-                          key={group.heading}
-                          p={6}
-                          gap={4}
-                          className="flex flex-col border-b border-black/[6%] last:border-0"
-                        >
-                          <h2 className="border-b border-black/5 pb-4 text-secondary-900 text-xl font-medium">
-                            {t(group.heading)}
-                          </h2>
+              <Form className="flex flex-col flex-1" style={{ overflow: 'auto' }}>
+                <DrawerBody>
+                  {activeTab === 'information' &&
+                    fieldItems.map((group) => (
+                      <Box key={group.heading} p={6}>
+                        <h2 className="text-lg font-semibold">{t(group.heading)}</h2>
+                        {group.fields.map((field) => (
+                          <MenuItemFormFieldRenderer
+                            key={field.name}
+                            {...field}
+                            isTaxIncluded={isTaxIncluded}
+                            taxRate={taxRate}
+                            onTaxIncludedChange={setIsTaxIncluded}
+                            onTaxRateChange={setTaxRate}
+                          />
+                        ))}
+                      </Box>
+                    ))}
 
-                          {group.fields.map((field) => (
-                            <MenuItemFormFieldRenderer key={field.name} {...field} />
-                          ))}
-                        </Box>
-                      ))}
-
-                    {activeTab === 'add-ons' && (
-                      <Flex flexDir="column">
-                        <Box
-                          p={6}
-                          gap={4}
-                          className="flex flex-col border-b border-black/[6%] last:border-0"
-                        >
-                          <h2 className="border-b border-black/5 pb-4 text-secondary-900 text-xl font-medium">
-                            {t('Variant')}
-                          </h2>
-                          <MenuItemFormFieldRenderer name="variantIds" type="tag-variants" />
-                        </Box>
-
-                        <Box
-                          p={6}
-                          gap={4}
-                          className="flex flex-col border-b border-black/[6%] last:border-0"
-                        >
-                          <h2 className="border-b border-black/5 pb-4 text-secondary-900 text-xl font-medium">
-                            {t('Addon')}
-                          </h2>
-                          <MenuItemFormFieldRenderer name="addonIds" type="tag-addons" />
-                        </Box>
-                      </Flex>
-                    )}
-                  </div>
+                  {activeTab === 'add-ons' && (
+                    <>
+                      <Box p={6}>
+                        <h2 className="text-lg font-semibold">{t('Variant')}</h2>
+                        <MenuItemFormFieldRenderer name="variantIds" type="tag-variants" />
+                      </Box>
+                      <Box p={6}>
+                        <h2 className="text-lg font-semibold">{t('Addon')}</h2>
+                        <MenuItemFormFieldRenderer name="addonIds" type="tag-addons" />
+                      </Box>
+                    </>
+                  )}
                 </DrawerBody>
-                <DrawerFooter
-                  borderTopWidth="1px"
-                  borderColor="secondary.200"
-                  className="bg-white w-full bottom-0"
-                >
+                <DrawerFooter>
                   {activeTab === 'information' ? (
                     <>
-                      <Button type="button" variant="outline" w="full" mr={3} onClick={onClose}>
+                      <Button variant="outline" mr={3} onClick={onClose}>
                         {t('Cancel')}
                       </Button>
                       <Button
-                        variant="solid"
                         colorScheme="primary"
-                        w="full"
-                        type="button"
                         onClick={() => {
                           setActiveTab('add-ons');
                           setSteps((s) =>
                             s.map((v) => (v.id === 'information' ? { ...v, isComplete: true } : v))
                           );
                         }}
-                        className="bg-primary-400 font-semibold hover:bg-primary-500 bg-transition"
                         rightIcon={<ArrowRight size={16} />}
                       >
                         {t('Next')}
@@ -285,9 +244,7 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
                   ) : (
                     <>
                       <Button
-                        type="button"
                         variant="outline"
-                        w="full"
                         mr={3}
                         onClick={() => setActiveTab('information')}
                         leftIcon={<ArrowLeft size={16} />}
@@ -295,20 +252,15 @@ export default function NewMenuItem({ refresh }: { refresh?: () => void }) {
                         {t('Back')}
                       </Button>
                       <Button
-                        variant="solid"
                         colorScheme="primary"
-                        w="full"
-                        type="button"
                         isLoading={isSubmitting}
-                        disabled={isSubmitting}
-                        className="bg-primary-400 font-semibold hover:bg-primary-500 bg-transition"
-                        rightIcon={<Add size={16} />}
                         onClick={() => {
                           if (Object.keys(errors).length) {
                             toast.error(t('Please fill all the fields'));
                           }
                           submitForm();
                         }}
+                        rightIcon={<Add size={16} />}
                       >
                         {t('Create')}
                       </Button>

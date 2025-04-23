@@ -30,6 +30,13 @@ router
     router.get('/:id/generate-invoice', [OrdersController, 'generateInvoice']);
     router.get('/count/status', [OrdersController, 'orderStatusCount']);
     router.post('/', [OrdersController, 'store']);
+    router.post('/updateOrderItemsPaidQuantity', [
+      OrdersController,
+      'updateOrderItemsPaidQuantity',
+    ]);
+    router.post('/move-table', [OrdersController, 'moveOrdersToAnotherTable']);
+    router.delete('/deleteOrderItem/:id', [OrdersController, 'deleteOrderItem']);
+    router.patch('/reduceOrderItemQuantity', [OrdersController, 'reduceOrderItemQuantity']);
     router.post('/calculate', [OrdersController, 'calculate']);
     router.post('/updatePaymentStatus', [OrdersController, 'updatePaymentStatus']);
     router.put('/:id', [OrdersController, 'update']);

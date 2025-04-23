@@ -15,6 +15,9 @@ export default class Table extends BaseModel {
   @column()
   declare number: number;
 
+  @column()
+  declare activeTableName: string;
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime;
 

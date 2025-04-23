@@ -35,6 +35,7 @@ export default class extends BaseSchema {
       table.double('grand_price').defaultTo(0.0).notNullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+      table.double('paid_quantity').defaultTo(0);
     });
   }
 

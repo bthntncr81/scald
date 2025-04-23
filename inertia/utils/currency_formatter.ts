@@ -26,7 +26,7 @@ export const convertToCurrencyFormat = (amount: number, opts: CurrencyOptions = 
     currencySymbolPosition = symbolPosition;
   }
 
-  const locale = opts.locale || 'en-US';
+  const locale = opts.locale || 'tr-TR';
   // Default to USD if no currency is specified in options
   const formatter = new Intl.NumberFormat(locale, {
     style: 'currency',

@@ -17,8 +17,9 @@ export default class extends BaseSchema {
 
       // Add the number column
       table.integer('number').notNullable();
+      table.text('active_table_name').nullable();
 
-      // Timestamp columns for created_at and updated_at
+      // Timestamp columns for created_at and updated_a
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
     });

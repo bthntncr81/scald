@@ -12,7 +12,18 @@ import EditTable from '@/components/Admin/Tables/EditTable';
 import NewTable from '@/components/Admin/Tables/NewTable';
 import ActiveOrdersDrawer from '@/components/Admin/Tables/Orders';
 import { convertToCurrencyFormat } from '@/utils/currency_formatter';
-import { IconButton } from '@chakra-ui/react';
+import {
+  IconButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  Button,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { Add, ElementPlus } from 'iconsax-react';
 
 export default function Tables() {
@@ -23,6 +34,25 @@ export default function Tables() {
   const searchedText = useDebounce(searchQuery, 300);
   const [selectedRows, setSelectedRows] = useState<Record<string, any>[]>([]);
   const [selectedTableArea, setSelectedTableArea] = useState<string | null>(null);
+
+  // Move Table Modal State
+  const [selectedSourceTable, setSelectedSourceTable] = useState<any>(null);
+  const {
+    isOpen: isMoveModalOpen,
+    onOpen: onOpenMoveModal,
+    onClose: onCloseMoveModal,
+  } = useDisclosure();
+
+  const handleMoveOrders = async (targetTableId: number) => {
+    if (!selectedSourceTable) return;
+    await fetch(`/api/orders/move-table`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fromTableId: selectedSourceTable.id, toTableId: targetTableId }),
+    });
+    onCloseMoveModal();
+    refresh();
+  };
 
   const { items, meta, isLoading, refresh, isValidating } = useTableData('/api/tables', {
     search: searchedText,
@@ -138,6 +168,16 @@ export default function Tables() {
                 {t('Total')} :&nbsp;{convertToCurrencyFormat(table.totalPrice)}
               </div>
               <div className="mt-4 flex justify-between items-center">
+                <IconButton
+                  onClick={() => {
+                    setSelectedSourceTable(table);
+                    onOpenMoveModal();
+                  }}
+                  aria-label="Masa Taşı"
+                  icon={<ElementPlus size="18" />}
+                  colorScheme="blue"
+                  variant="outline"
+                />
                 <DeleteTable id={table.id} refresh={refresh} />
                 <ActiveOrdersDrawer tableId={table.id} refresh={refresh} />
                 <EditTable table={table} refresh={refresh} />
@@ -145,6 +185,33 @@ export default function Tables() {
             </div>
           ))}
         </div>
+
+        {/* Move Table Modal */}
+        <Modal isOpen={isMoveModalOpen} onClose={onCloseMoveModal}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Masa Taşı</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {items
+                  .filter((t: any) => t.id !== selectedSourceTable?.id)
+                  .map((table: any) => (
+                    <div
+                      key={table.id}
+                      className="p-3 border border-gray-300 rounded hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleMoveOrders(table.id)}
+                    >
+                      {table.tableAreaName} - #{table.number}
+                    </div>
+                  ))}
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={onCloseMoveModal}>Kapat</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
 
         {/* Pagination */}
         {/* {meta && (
