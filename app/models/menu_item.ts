@@ -12,6 +12,7 @@ import { compose } from '@adonisjs/core/helpers';
 import MenuItemFilter from '#models/filters/menu_item_filter';
 import formatPrecision from '../utils/format_precision.js';
 import OrderItem from '#models/order_item';
+import MenuItemRecipe from './menu_item_recipe.js';
 
 export default class MenuItem extends compose(BaseModel, Filterable, Attachmentable) {
   static $filter = () => MenuItemFilter;
@@ -99,4 +100,7 @@ export default class MenuItem extends compose(BaseModel, Filterable, Attachmenta
 
   @hasMany(() => OrderItem)
   declare orderItems: HasMany<typeof OrderItem>;
+
+  @hasMany(() => MenuItemRecipe)
+  declare recipes: HasMany<typeof MenuItemRecipe>;
 }

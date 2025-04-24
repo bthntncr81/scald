@@ -17,6 +17,8 @@ import '../app/routes/auth_route.js';
 import '../app/routes/addon_route.js';
 import '../app/routes/table_area.route.js';
 import '../app/routes/table_route.js';
+import '../app/routes/stock_items_route.js';
+import '../app/routes/recipe_route.js';
 import '../app/routes/category_route.js';
 import '../app/routes/charge_route.js';
 import '../app/routes/coupon_route.js';
@@ -99,6 +101,8 @@ router
     router.on('/menu-items').renderInertia('Admin/MenuItems');
     router.on('/table-areas').renderInertia('Admin/TableAreas');
     router.on('/table-pos').renderInertia('Admin/TablePOS');
+    router.on('/stock-items').renderInertia('Admin/StockItems');
+    router.on('/recipe').renderInertia('Admin/Recipe');
 
     router.on('/tables').renderInertia('Admin/Tables');
     router.on('/pos').renderInertia('Admin/POS');

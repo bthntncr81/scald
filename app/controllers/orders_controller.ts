@@ -857,10 +857,7 @@ export default class OrdersController {
   async moveOrdersToAnotherTable({ request, response, logger }: HttpContext) {
     try {
       const { fromTableId, toTableId } = request.only(['fromTableId', 'toTableId']);
-      await Order.query()
-        .where('table_id', fromTableId)
-        .andWhere('paymentStatus', false)
-        .update({ tableId: toTableId });
+      await Order.query().where('table_id', fromTableId).update({ tableId: toTableId });
       return response.ok({ success: true, message: 'Orders moved successfully.' });
     } catch (error) {
       logger.error('Move Orders Error', error);

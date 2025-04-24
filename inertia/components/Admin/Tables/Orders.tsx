@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'sonner';
 import useWindowSize from '@/hooks/useWindowSize';
+import { debug } from 'console';
 
 type Addon = {
   id: number;
@@ -78,6 +79,7 @@ export default function ActiveOrdersDrawer({
       checked: boolean;
       itemId: number;
       quantity: number;
+      paidQuantity: number;
     }[]
   >([]);
 
@@ -95,6 +97,7 @@ export default function ActiveOrdersDrawer({
             checked: boolean;
             itemId: number;
             quantity: number;
+            paidQuantity: number;
           }[] = [];
           rawOrders.forEach((order: any) => {
             order.orderItems.forEach((item: any) => {
@@ -111,9 +114,10 @@ export default function ActiveOrdersDrawer({
                   id: `${order.id}_${item.id}_${i}`,
                   name: item.name,
                   price: unitPrice,
-                  checked: i < paidQty, // Ödenmişse otomatik seçili
+                  checked: false, // Ödenmişse otomatik seçili
                   itemId: item.id,
                   quantity: quantity,
+                  paidQuantity: paidQty,
                 });
               }
             });
@@ -144,11 +148,10 @@ export default function ActiveOrdersDrawer({
   // Handle Partial Payment for Selected Items
   const handlePartialPayment = () => {
     const itemMap: Record<string, { orderItemId: number; paidQuantity: number }> = {};
-
     expandedItems.forEach((item) => {
       const [orderId, itemId] = item.id.split('_').map(Number);
       if (!itemMap[itemId]) {
-        itemMap[itemId] = { orderItemId: itemId, paidQuantity: 0 };
+        itemMap[itemId] = { orderItemId: itemId, paidQuantity: item.paidQuantity };
       }
       if (item.checked) {
         itemMap[itemId].paidQuantity += 1;
