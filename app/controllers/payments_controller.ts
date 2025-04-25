@@ -6,6 +6,7 @@ import StripePayment from '#services/payment/stripe';
 import PaymentMethod from '#models/payment_method';
 import transmit from '@adonisjs/transmit/services/main';
 import axios from 'axios';
+import db from '@adonisjs/lucid/services/db';
 
 export default class PaymentsController {
   private async getMethodConfig(key: string) {
@@ -175,6 +176,34 @@ export default class PaymentsController {
               status: 'processing',
             })
             .save();
+          const orderItems = await order.related('orderItems').query();
+          for (const item of orderItems) {
+            // seçili variantOptionId'yi bul
+            let selectedVariantOptionId = null;
+            if (item.variants?.length > 0 && item.variants[0]?.variantOptions?.length > 0) {
+              selectedVariantOptionId = item.variants[0].variantOptions[0].id;
+            }
+
+            const recipes = await db
+              .from('menu_item_recipes')
+              .where('menu_item_id', item.menuItemId)
+              .andWhere((builder) => {
+                builder
+                  .whereNull('variant_option_id')
+                  .orWhere('variant_option_id', selectedVariantOptionId || null);
+              });
+
+            for (const recipe of recipes) {
+              const stock = await db.from('stock_items').where('id', recipe.stock_item_id).first();
+              if (stock) {
+                const newQuantity = stock.quantity - recipe.amount * item.quantity;
+                await db
+                  .from('stock_items')
+                  .where('id', recipe.stock_item_id)
+                  .update({ quantity: newQuantity });
+              }
+            }
+          }
 
           await notification_service.sendNewOrderNotification(auth.user!, order);
 

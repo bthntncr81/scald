@@ -18,6 +18,13 @@ export default class extends BaseSchema {
         .references('id')
         .inTable('stock_items')
         .onDelete('CASCADE');
+      table
+        .integer('variant_option_id')
+        .unsigned()
+        .nullable()
+        .references('id')
+        .inTable('variant_options')
+        .onDelete('CASCADE');
       table.float('amount').notNullable(); // 30, 50 vs.
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());

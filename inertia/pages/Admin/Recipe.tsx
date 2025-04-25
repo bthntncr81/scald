@@ -94,6 +94,10 @@ export default function MenuItemRecipes() {
               header: () => t('Menu Item'),
             },
             {
+              accessorKey: 'variant_option_name',
+              header: () => t('Variant Option'),
+            },
+            {
               accessorKey: 'stock_item_name',
               header: () => t('Stock Item'),
             },

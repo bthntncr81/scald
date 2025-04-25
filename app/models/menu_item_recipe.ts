@@ -2,6 +2,7 @@ import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm';
 import type { BelongsTo } from '@adonisjs/lucid/types/relations';
 import MenuItem from './menu_item.js';
 import StockItem from './stock_item.js';
+import VariantOption from './variant_option.js';
 
 export default class MenuItemRecipe extends BaseModel {
   @column({ isPrimary: true })
@@ -14,6 +15,9 @@ export default class MenuItemRecipe extends BaseModel {
   declare stockItemId: number;
 
   @column()
+  declare variantOptionId: number;
+
+  @column()
   declare amount: number;
 
   @column()
@@ -24,4 +28,7 @@ export default class MenuItemRecipe extends BaseModel {
 
   @belongsTo(() => StockItem)
   declare stockItem: BelongsTo<typeof StockItem>;
+
+  @belongsTo(() => VariantOption)
+  declare variantOption: BelongsTo<typeof VariantOption>;
 }

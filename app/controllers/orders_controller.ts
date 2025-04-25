@@ -21,6 +21,7 @@ import transmit from '@adonisjs/transmit/services/main';
 import { stringify } from 'csv-stringify/sync';
 import { DateTime } from 'luxon';
 import Roles from '../enum/roles.js';
+import db from '@adonisjs/lucid/services/db';
 
 type VariantType = { id: number; optionIds: Array<number> };
 type AddonType = { id: number; quantity: number };
@@ -490,6 +491,48 @@ export default class OrdersController {
             });
           } catch (error) {
             console.error('Ödeme hatası:', error.response?.data || error.message);
+          }
+        }
+      } else {
+        for (const item of orderItemsData) {
+          const selectedVariantOptionIds: number[] = [];
+
+          if (JSON.parse(item.variants)?.length > 0) {
+            for (const variant of JSON.parse(item.variants)) {
+              if (variant.variantOptions?.length > 0) {
+                for (const variantOption of variant.variantOptions) {
+                  selectedVariantOptionIds.push(variantOption.id);
+                }
+              }
+            }
+          }
+
+          const recipes = await db
+            .from('menu_item_recipes')
+            .where('menu_item_id', item.menuItemId)
+            .andWhere((builder) => {
+              if (selectedVariantOptionIds.length > 0) {
+                builder
+                  .whereNull('variant_option_id')
+                  .orWhereIn('variant_option_id', selectedVariantOptionIds);
+              } else {
+                builder.whereNull('variant_option_id');
+              }
+            });
+
+          console.log('Fetched recipes:', recipes);
+
+          for (const recipe of recipes) {
+            const stock = await db.from('stock_items').where('id', recipe.stock_item_id).first();
+            console.log('Stock before update:', stock);
+            if (stock) {
+              const newQuantity = stock.quantity - recipe.amount * item.quantity;
+              console.log('New stock quantity:', newQuantity);
+              await db
+                .from('stock_items')
+                .where('id', recipe.stock_item_id)
+                .update({ quantity: newQuantity });
+            }
           }
         }
       }

@@ -27,6 +27,7 @@ export default function NewMenuItemRecipe({ refresh }: { refresh: () => void }) 
 
   const [menuItems, setMenuItems] = useState([]);
   const [stockItems, setStockItems] = useState([]);
+  const [variantOptions, setVariantOptions] = useState([]);
   const [selectedUnit, setSelectedUnit] = useState('');
 
   useEffect(() => {
@@ -64,12 +65,19 @@ export default function NewMenuItemRecipe({ refresh }: { refresh: () => void }) 
             initialValues={{
               menu_item_id: '',
               stock_item_id: '',
+              variant_option_id: '',
               amount: 0,
             }}
             onSubmit={async (values, actions) => {
               try {
                 actions.setSubmitting(true);
-                const { data } = await axios.post('/api/menu-item-recipes', values);
+                const payload = {
+                  menu_item_id: values.menu_item_id,
+                  stock_item_id: values.stock_item_id,
+                  variant_option_id: values.variant_option_id || null,
+                  amount: values.amount,
+                };
+                const { data } = await axios.post('/api/menu-item-recipes', payload);
                 if (data?.success) {
                   onClose();
                   refresh();
@@ -82,17 +90,41 @@ export default function NewMenuItemRecipe({ refresh }: { refresh: () => void }) 
               }
             }}
           >
-            {({ isSubmitting, setFieldValue }) => (
+            {({ isSubmitting, setFieldValue, values }) => (
               <Form className="flex flex-1 flex-col overflow-y-auto">
                 <DrawerBody className="space-y-4 h-full flex-1 overflow-y-auto">
                   <div className="flex flex-col gap-5 border-b border-black/5 pb-4">
                     <Select
                       placeholder={t('Select menu item')}
-                      onChange={(e) => setFieldValue('menu_item_id', e.target.value)}
+                      onChange={(e) => {
+                        const menuItemId = e.target.value;
+                        setFieldValue('menu_item_id', menuItemId);
+                        setFieldValue('variant_option_id', '');
+                        const selectedMenuItem = menuItems.find(
+                          (item: any) => item.id == menuItemId
+                        ) as any;
+                        setVariantOptions(
+                          selectedMenuItem?.variants!.flatMap((v: any) => v.variantOptions) || []
+                        );
+                      }}
+                      value={values.menu_item_id}
                     >
                       {menuItems.map((item: any) => (
                         <option key={item.id} value={item.id}>
                           {item.name}
+                        </option>
+                      ))}
+                    </Select>
+
+                    <Select
+                      placeholder={t('Select variant option')}
+                      onChange={(e) => setFieldValue('variant_option_id', e.target.value)}
+                      value={values.variant_option_id}
+                      isDisabled={!values.menu_item_id || variantOptions.length === 0}
+                    >
+                      {variantOptions.map((option: any) => (
+                        <option key={option.id} value={option.id}>
+                          {option.name}
                         </option>
                       ))}
                     </Select>

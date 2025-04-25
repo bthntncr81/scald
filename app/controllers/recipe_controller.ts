@@ -9,6 +9,7 @@ export default class RecipeController {
       const dataQuery = MenuItemRecipe.query()
         .preload('menuItem')
         .preload('stockItem')
+        .preload('variantOption')
         .orderBy('created_at', 'desc');
 
       const data = page && limit ? await dataQuery.paginate(page, limit) : await dataQuery.exec();
@@ -18,20 +19,17 @@ export default class RecipeController {
           id: recipe.id,
           menu_item_id: recipe.menuItem.id,
           stock_item_id: recipe.stockItem.id,
+          variant_option_id: recipe.variantOption?.id || null,
           amount: recipe.amount,
           created_at: recipe.created_at,
           updated_at: recipe.updated_at,
           menu_item_name: recipe.menuItem?.name || '',
           stock_item_name: recipe.stockItem?.name || '',
+          variant_option_name: recipe.variantOption?.name || '',
           unit: recipe.stockItem?.unit || '',
         })
       );
-      console.log('------------');
-      console.log('------------');
-      console.log('------------');
-      console.log(transformed);
-      console.log('------------');
-      console.log('------------');
+
       return response.json({
         ...(page && limit ? { meta: (data as any).meta } : {}),
         data: transformed,
@@ -53,7 +51,13 @@ export default class RecipeController {
 
   async store({ logger, request, response }: HttpContext) {
     try {
-      const payload = request.only(['menu_item_id', 'stock_item_id', 'amount', 'unit']);
+      const payload = request.only([
+        'menu_item_id',
+        'stock_item_id',
+        'amount',
+        'unit',
+        'variant_option_id',
+      ]);
       const recipe = await MenuItemRecipe.create(payload);
 
       return response.created({
@@ -69,7 +73,13 @@ export default class RecipeController {
   async update({ logger, request, response, params }: HttpContext) {
     try {
       const recipe = await MenuItemRecipe.findOrFail(params.id);
-      const payload = request.only(['menu_item_id', 'stock_item_id', 'amount', 'unit']);
+      const payload = request.only([
+        'menu_item_id',
+        'stock_item_id',
+        'amount',
+        'unit',
+        'variant_option_id',
+      ]);
       recipe.merge(payload);
       await recipe.save();
 

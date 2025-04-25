@@ -34,15 +34,20 @@ export default function EditMenuItemRecipe({
   const [menuItems, setMenuItems] = useState([]);
   const [stockItems, setStockItems] = useState([]);
   const [selectedUnit, setSelectedUnit] = useState('');
+  const [variantOptions, setVariantOptions] = useState([]);
 
   useEffect(() => {
-    axios.get('/api/menu-items').then(({ data }) => setMenuItems(data));
+    axios.get('/api/menu-items').then(({ data }) => {
+      setMenuItems(data);
+      const selectedMenuItem = data.find((item: any) => item.id == recipe.menu_item_id);
+      setVariantOptions(selectedMenuItem?.variants?.flatMap((v: any) => v.variantOptions) || []);
+    });
     axios.get('/api/stock-items').then(({ data }) => {
       setStockItems(data);
       const found = data.find((s: any) => s.id === recipe.stock_item_id);
       setSelectedUnit(found?.unit || '');
     });
-  }, [recipe.stock_item_id]);
+  }, [recipe.menu_item_id, recipe.stock_item_id]);
 
   return (
     <>
@@ -74,6 +79,7 @@ export default function EditMenuItemRecipe({
             initialValues={{
               menu_item_id: recipe.menu_item_id,
               stock_item_id: recipe.stock_item_id,
+              variant_option_id: recipe.variant_option_id || '',
               amount: recipe.amount,
             }}
             onSubmit={async (values, actions) => {
@@ -82,6 +88,7 @@ export default function EditMenuItemRecipe({
                 const payload = {
                   menu_item_id: values.menu_item_id,
                   stock_item_id: values.stock_item_id,
+                  variant_option_id: values.variant_option_id || null,
                   amount: values.amount,
                 };
                 const { data } = await axios.put(`/api/menu-item-recipes/${recipe.id}`, payload);
@@ -103,11 +110,32 @@ export default function EditMenuItemRecipe({
                   <Select
                     value={values.menu_item_id}
                     placeholder={t('Select menu item')}
-                    onChange={(e) => setFieldValue('menu_item_id', e.target.value)}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setFieldValue('menu_item_id', id);
+                      setFieldValue('variant_option_id', '');
+                      const selectedMenuItem = menuItems.find((item: any) => item.id == id) as any;
+                      setVariantOptions(
+                        selectedMenuItem?.variants?.flatMap((v: any) => v.variantOptions) || []
+                      );
+                    }}
                   >
                     {menuItems.map((item: any) => (
                       <option key={item.id} value={item.id}>
                         {item.name}
+                      </option>
+                    ))}
+                  </Select>
+
+                  <Select
+                    value={values.variant_option_id}
+                    placeholder={t('Select variant option')}
+                    onChange={(e) => setFieldValue('variant_option_id', e.target.value)}
+                    isDisabled={variantOptions.length === 0}
+                  >
+                    {variantOptions.map((option: any) => (
+                      <option key={option.id} value={option.id}>
+                        {option.name}
                       </option>
                     ))}
                   </Select>
